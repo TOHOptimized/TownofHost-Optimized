@@ -24,7 +24,9 @@ internal class ChatCommands
     private static readonly string modTagsFiles = @"./TOHE-DATA/Tags/MOD_TAGS";
     private static readonly string sponsorTagsFiles = @"./TOHE-DATA/Tags/SPONSOR_TAGS";
     private static readonly string vipTagsFiles = @"./TOHE-DATA/Tags/VIP_TAGS";
-    
+    private static readonly string exclusiveTagsFiles = @"./TOHE-DATA/Tags/EXCLUSIVE_TAGS";
+    private static readonly string specialTagsFiles = @"./TOHE-DATA/Tags/SPECIAL_TAGS";
+
     private static readonly Dictionary<char, int> Pollvotes = [];
     private static readonly Dictionary<char, string> PollQuestions = [];
     private static readonly List<byte> PollVoted = [];
@@ -69,7 +71,9 @@ internal class ChatCommands
         if (PlayerControl.LocalPlayer.GetRoleClass() is Swapper sw && sw.SwapMsg(PlayerControl.LocalPlayer, text)) goto Canceled; 
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
+        Directory.CreateDirectory(exclusiveTagsFiles);
         Directory.CreateDirectory(sponsorTagsFiles);
+        Directory.CreateDirectory(specialTagsFiles);
 
         if (Blackmailer.CheckBlackmaile(PlayerControl.LocalPlayer) && PlayerControl.LocalPlayer.IsAlive())
         {
@@ -465,7 +469,7 @@ internal class ChatCommands
 
                     if (string.IsNullOrEmpty(subArgs))
                     {
-                        HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser().GetUserType(), Devbox, UpBox, ColorBox)}");
+                        HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser(), Devbox, UpBox, ColorBox)}");
                     }
                     else
                     {
@@ -476,7 +480,7 @@ internal class ChatCommands
                                 var targetplayer = Utils.GetPlayerById(meid);
                                 if (targetplayer != null && targetplayer.GetClient() != null)
                                 {
-                                    HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandTargetInfo"), targetplayer.PlayerId, targetplayer.GetRealName(clientData: true), targetplayer.GetClient().FriendCode, targetplayer.GetClient().GetHashedPuid(), targetplayer.FriendCode.GetDevUser().GetUserType())}");
+                                    HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandTargetInfo"), targetplayer.PlayerId, targetplayer.GetRealName(clientData: true), targetplayer.GetClient().FriendCode, targetplayer.GetClient().GetHashedPuid(), targetplayer.FriendCode.GetDevUser())}");
                                 }
                                 else
                                 {
@@ -485,7 +489,7 @@ internal class ChatCommands
                             }
                             else
                             {
-                                HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser().GetUserType(), Devbox, UpBox, ColorBox)}");
+                                HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser(), Devbox, UpBox, ColorBox)}");
                             }
                         }
                         else
@@ -1345,6 +1349,26 @@ internal class ChatCommands
         return !canceled;
     }
 
+    private static void ChangeRoleCommand(ChatController __instance, PlayerControl player, string text, string[] args)
+    {
+        if (GameStates.IsLobby || !player.FriendCode.GetDevUser().IsUp) return;
+        string subArgs = text.Remove(0, 8);
+        var setRole = FixRoleNameInput(subArgs.Trim());
+        foreach (CustomRoles rl in Enum.GetValues<CustomRoles>())
+        {
+            if (rl.IsVanilla()) continue;
+            var roleName = GetString(rl.ToString()).ToLower().Trim();
+            if (setRole.Contains(roleName))
+            {
+                if (!rl.IsAdditionRole()) player.SetRole(rl.GetRoleTypes());
+                player.RpcSetCustomRole(rl);
+
+                Main.PlayerStates[player.PlayerId].RemoveSubRole(CustomRoles.NotAssigned);
+                break;
+            }
+        }
+    }
+
     public static string FixRoleNameInput(string text)
     {
         text = text.Replace("着", "者").Trim().ToLower();
@@ -1830,7 +1854,9 @@ internal class ChatCommands
 
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
+        Directory.CreateDirectory(exclusiveTagsFiles);
         Directory.CreateDirectory(sponsorTagsFiles);
+        Directory.CreateDirectory(specialTagsFiles);
 
         if (Blackmailer.CheckBlackmaile(player) && player.IsAlive() && !player.IsModClient())
         {
@@ -1957,7 +1983,7 @@ internal class ChatCommands
             case "/rename":
             case "/renomear":
             case "/переименовать":
-                if (Options.PlayerCanSetName.GetBool() || player.FriendCode.GetDevUser().IsDev || player.FriendCode.GetDevUser().NameCmd || Utils.IsPlayerVIP(player.FriendCode))
+                if (Options.PlayerCanSetName.GetBool() || player.FriendCode.GetDevUser().IsDev || Utils.IsPlayerVIP(player.FriendCode) || Utils.IsPlayerExclusive(player.FriendCode) || Utils.IsPlayerSpecial(player.FriendCode))
                 {
                     if (GameStates.IsInGame)
                     {
@@ -2137,7 +2163,7 @@ internal class ChatCommands
             case "/color":
             case "/cor":
             case "/цвет":
-                if (Options.PlayerCanSetColor.GetBool() || player.FriendCode.GetDevUser().IsDev || player.FriendCode.GetDevUser().ColorCmd || Utils.IsPlayerVIP(player.FriendCode))
+                if (Options.PlayerCanSetColor.GetBool() || player.FriendCode.GetDevUser().IsDev || player.FriendCode.GetDevUser().ColorCmd || Utils.IsPlayerVIP(player.FriendCode) || Utils.IsPlayerExclusive(player.FriendCode) || Utils.IsPlayerSpecial(player.FriendCode))
                 {
                     if (GameStates.IsInGame)
                     {
@@ -2549,8 +2575,128 @@ internal class ChatCommands
                         Logger.Msg($"File Not exist, creating file at {vipTagsFiles}/{player.FriendCode}.txt", "vipcolor");
                         File.Create(colorFilePathh).Close();
                     }
-                    //Logger.Msg($"File exists, creating file at {vipTagsFiles}/{player.FriendCode}.txt", "vipcolor");
-                    //Logger.Msg($"{subArgs}","modcolor");
+                    File.WriteAllText(colorFilePathh, $"{subArgs}");
+                    break;
+                }
+            case "/exclusivecolor":
+            case "/exclusivecolour":
+            case "/exccolor":
+            case "/excolor":
+            case "/ecolor":
+            case "/exccolour":
+            case "/excolour":
+            case "/ecolour":
+                if (Options.ApplyExclusiveList.GetValue() == 0)
+                {
+                    Utils.SendMessage(GetString("ExclusiveColorCommandDisabled"), player.PlayerId);
+                    break;
+                }
+                if (!Utils.IsPlayerExclusive(player.FriendCode))
+                {
+                    Utils.SendMessage(GetString("ExclusiveColorCommandNoAccess"), player.PlayerId);
+                    break;
+                }
+                if (!GameStates.IsLobby)
+                {
+                    Utils.SendMessage(GetString("ExclusiveColorCommandNoLobby"), player.PlayerId);
+                    break;
+                }
+                if (!Options.GradientTagsOpt.GetBool()) 
+                { 
+                    subArgs = args.Length != 2 ? "" : args[1];
+                    if (string.IsNullOrEmpty(subArgs) || !Utils.CheckColorHex(subArgs))
+                    {
+                        Logger.Msg($"{subArgs}", "exclusivecolor");
+                        Utils.SendMessage(GetString("ExclusiveColorInvalidHexCode"), player.PlayerId);
+                        break;
+                    }
+                    string colorFilePathh = $"{exclusiveTagsFiles}/{player.FriendCode}.txt";
+                    if (!File.Exists(colorFilePathh))
+                    {
+                        Logger.Warn($"File Not exist, creating file at {exclusiveTagsFiles}/{player.FriendCode}.txt", "exclusivecolor");
+                        File.Create(colorFilePathh).Close();
+                    }
+        
+                    File.WriteAllText(colorFilePathh, $"{subArgs}");
+                    break;
+                }
+                else
+                {
+                    subArgs = args.Length < 3 ? "" : args[1] + " " + args[2];
+                    Regex regexx = new(@"^[0-9A-Fa-f]{6}\s[0-9A-Fa-f]{6}$");
+                    if (string.IsNullOrEmpty(subArgs) || !regexx.IsMatch(subArgs))
+                    {
+                        Logger.Msg($"{subArgs}", "exclusivecolor");
+                        Utils.SendMessage(GetString("ExclusiveColorInvalidGradientCode"), player.PlayerId);
+                        break;
+                    }
+                    string colorFilePathh = $"{exclusiveTagsFiles}/{player.FriendCode}.txt";
+                    if (!File.Exists(colorFilePathh))
+                    {
+                        Logger.Msg($"File Not exist, creating file at {exclusiveTagsFiles}/{player.FriendCode}.txt", "exclusivecolor");
+                        File.Create(colorFilePathh).Close();
+                    }
+                    File.WriteAllText(colorFilePathh, $"{subArgs}");
+                    break;
+                }
+            case "/specialcolor":
+            case "/specialcolour":
+            case "/specolor":
+            case "/spcolor":
+            case "/scolor":
+            case "/specolour":
+            case "/spcolour":
+            case "/scolour":
+                if (Options.ApplySpecialList.GetValue() == 0)
+                {
+                    Utils.SendMessage(GetString("SpecialColorCommandDisabled"), player.PlayerId);
+                    break;
+                }
+                if (!Utils.IsPlayerSpecial(player.FriendCode))
+                {
+                    Utils.SendMessage(GetString("SpecialColorCommandNoAccess"), player.PlayerId);
+                    break;
+                }
+                if (!GameStates.IsLobby)
+                {
+                    Utils.SendMessage(GetString("SpecialColorCommandNoLobby"), player.PlayerId);
+                    break;
+                }
+                if (!Options.GradientTagsOpt.GetBool()) 
+                { 
+                    subArgs = args.Length != 2 ? "" : args[1];
+                    if (string.IsNullOrEmpty(subArgs) || !Utils.CheckColorHex(subArgs))
+                    {
+                        Logger.Msg($"{subArgs}", "specialcolor");
+                        Utils.SendMessage(GetString("SpecialColorInvalidHexCode"), player.PlayerId);
+                        break;
+                    }
+                    string colorFilePathh = $"{specialTagsFiles}/{player.FriendCode}.txt";
+                    if (!File.Exists(colorFilePathh))
+                    {
+                        Logger.Warn($"File Not exist, creating file at {specialTagsFiles}/{player.FriendCode}.txt", "specialcolor");
+                        File.Create(colorFilePathh).Close();
+                    }
+        
+                    File.WriteAllText(colorFilePathh, $"{subArgs}");
+                    break;
+                }
+                else
+                {
+                    subArgs = args.Length < 3 ? "" : args[1] + " " + args[2];
+                    Regex regexx = new(@"^[0-9A-Fa-f]{6}\s[0-9A-Fa-f]{6}$");
+                    if (string.IsNullOrEmpty(subArgs) || !regexx.IsMatch(subArgs))
+                    {
+                        Logger.Msg($"{subArgs}", "specialcolor");
+                        Utils.SendMessage(GetString("SpecialColorInvalidGradientCode"), player.PlayerId);
+                        break;
+                    }
+                    string colorFilePathh = $"{specialTagsFiles}/{player.FriendCode}.txt";
+                    if (!File.Exists(colorFilePathh))
+                    {
+                        Logger.Msg($"File Not exist, creating file at {specialTagsFiles}/{player.FriendCode}.txt", "specialcolor");
+                        File.Create(colorFilePathh).Close();
+                    }
                     File.WriteAllText(colorFilePathh, $"{subArgs}");
                     break;
                 }
@@ -2876,7 +3022,7 @@ internal class ChatCommands
                 subArgs = text.Length == 3 ? string.Empty : text.Remove(0, 3);
                 if (string.IsNullOrEmpty(subArgs))
                 {
-                    Utils.SendMessage((player.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), player.PlayerId, player.GetRealName(clientData: true), player.GetClient().FriendCode, player.GetClient().GetHashedPuid(), player.FriendCode.GetDevUser().GetUserType(), Devbox, UpBox, ColorBox)}", player.PlayerId);
+                    Utils.SendMessage((player.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), player.PlayerId, player.GetRealName(clientData: true), player.GetClient().FriendCode, player.GetClient().GetHashedPuid(), player.FriendCode.GetDevUser(), Devbox, UpBox, ColorBox)}", player.PlayerId);
                 }
                 else
                 {
@@ -2895,7 +3041,7 @@ internal class ChatCommands
                             var targetplayer = Utils.GetPlayerById(meid);
                             if (targetplayer != null && targetplayer.GetClient() != null)
                             {
-                                Utils.SendMessage($"{string.Format(GetString("Message.MeCommandTargetInfo"), targetplayer.PlayerId, targetplayer.GetRealName(clientData: true), targetplayer.GetClient().FriendCode, targetplayer.GetClient().GetHashedPuid(), targetplayer.FriendCode.GetDevUser().GetUserType())}", player.PlayerId);
+                                Utils.SendMessage($"{string.Format(GetString("Message.MeCommandTargetInfo"), targetplayer.PlayerId, targetplayer.GetRealName(clientData: true), targetplayer.GetClient().FriendCode, targetplayer.GetClient().GetHashedPuid(), targetplayer.FriendCode.GetDevUser())}", player.PlayerId);
                             }
                             else
                             {
@@ -2904,7 +3050,7 @@ internal class ChatCommands
                         }
                         else
                         {
-                            Utils.SendMessage($"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser().GetUserType(), Devbox, UpBox, ColorBox)}", player.PlayerId);
+                            Utils.SendMessage($"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser(), Devbox, UpBox, ColorBox)}", player.PlayerId);
                         }
                     }
                     else

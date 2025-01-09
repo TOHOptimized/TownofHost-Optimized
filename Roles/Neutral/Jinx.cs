@@ -45,6 +45,7 @@ internal class Jinx : RoleBase
         if (AbilityLimit <= 0) return true;
         if (killer.Is(CustomRoles.Pestilence)) return true;
         if (killer == target) return true;
+        if (!killer.IsAlive()) return true;
         
         killer.RpcGuardAndKill(target);
         target.RpcGuardAndKill(target);

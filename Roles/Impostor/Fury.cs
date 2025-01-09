@@ -54,26 +54,30 @@ internal class Fury : RoleBase
     }
     public override bool OnCheckShapeshift(PlayerControl player, PlayerControl targetSS, ref bool resetCooldown, ref bool shouldAnimate)
     {
-        player.SetKillCooldown(RageKillCooldown.GetFloat());
-        player.Notify(GetString("FuryInRage"), RageDuration.GetFloat());
-        foreach (var target in Main.AllPlayerControls)
-        {
-            if (NotifyRageActive.GetBool()) target.KillFlash();
-            if (NotifyRageActive.GetBool()) target.Notify(GetString("SeerFuryInRage"), 5f);
-        }
-        player.MarkDirtySettings();
-        var tmpSpeed = Main.AllPlayerSpeed[player.PlayerId];
-        Main.AllPlayerSpeed[player.PlayerId] = SpeedInRage.GetFloat();
-        var tmpKillCooldown = Main.AllPlayerKillCooldown[player.PlayerId];
-        Main.AllPlayerKillCooldown[player.PlayerId] = RageKillCooldown.GetFloat();
+        if (player.PlayerId == targetSS.PlayerId) return true;
+        { 
+           player.SetKillCooldown(RageKillCooldown.GetFloat());
+           player.Notify(GetString("FuryInRage"), RageDuration.GetFloat());
+           foreach (var target in Main.AllPlayerControls)
+           {
+               if (NotifyRageActive.GetBool()) target.KillFlash();
+               if (NotifyRageActive.GetBool()) target.Notify(GetString("SeerFuryInRage"), 5f);
+           }
+           player.MarkDirtySettings();
+           var tmpSpeed = Main.AllPlayerSpeed[player.PlayerId];
+           Main.AllPlayerSpeed[player.PlayerId] = SpeedInRage.GetFloat();
+           var tmpKillCooldown = Main.AllPlayerKillCooldown[player.PlayerId];
+           Main.AllPlayerKillCooldown[player.PlayerId] = RageKillCooldown.GetFloat();
+        
 
         _ = new LateTask(() =>
         {
             Main.AllPlayerSpeed[player.PlayerId] = Main.AllPlayerSpeed[player.PlayerId] - SpeedInRage.GetFloat() + tmpSpeed;
             Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllPlayerKillCooldown[player.PlayerId] - RageKillCooldown.GetFloat() + tmpKillCooldown;
             player.MarkDirtySettings();
-        }, RageDuration.GetFloat());
-        return false;          
+        }, RageDuration.GetFloat());  
+        return false;  
+        }     
     }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {

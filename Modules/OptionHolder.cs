@@ -163,6 +163,8 @@ public static class Options
     public static OptionItem ApplyBanList;
     public static OptionItem ApplyModeratorList;
     public static OptionItem AllowSayCommand;
+    public static OptionItem ApplyExclusiveList;
+    public static OptionItem ApplySpecialList;
 
     //public static OptionItem ApplyReminderMsg;
     //public static OptionItem TimeForReminder;
@@ -784,11 +786,19 @@ public static class Options
          * MINI 
          */
         CustomRoles.Mini.GetStaticRoleClass().SetupCustomOption();
+        /*
+         * HINDERING ROLES
+         */
+        TextOptionItem.Create(10000008, "RoleType.CrewHindering", TabGroup.CrewmateRoles)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(140, 255, 255, byte.MaxValue));
+
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateHindering).ForEach(r => r.SetupCustomOption());
 
         /*
          * SUPPORT ROLES
          */
-        TextOptionItem.Create(10000008, "RoleType.CrewSupport", TabGroup.CrewmateRoles)
+        TextOptionItem.Create(10000009, "RoleType.CrewSupport", TabGroup.CrewmateRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
@@ -797,7 +807,7 @@ public static class Options
         /*
          * KILLING ROLES
          */
-        TextOptionItem.Create(10000009, "RoleType.CrewKilling", TabGroup.CrewmateRoles)
+        TextOptionItem.Create(10000010, "RoleType.CrewKilling", TabGroup.CrewmateRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
@@ -806,7 +816,7 @@ public static class Options
         /*
          * POWER ROLES
          */
-        TextOptionItem.Create(10000010, "RoleType.CrewPower", TabGroup.CrewmateRoles)
+        TextOptionItem.Create(10000011, "RoleType.CrewPower", TabGroup.CrewmateRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
@@ -896,6 +906,8 @@ public static class Options
 
         Flash.SetupCustomOption();
 
+        // Informable.SetupCustomOptions();
+
         Lazy.SetupCustomOptions();
 
         Loyal.SetupCustomOptions();
@@ -915,6 +927,8 @@ public static class Options
         Silent.SetupCustomOptions();
 
         Sleuth.SetupCustomOptions();
+
+        Identifier.SetupCustomOptions();
 
         Tiebreaker.SetupCustomOptions();
     
@@ -947,6 +961,8 @@ public static class Options
         Unlucky.SetupCustomOptions();
         
         Tired.SetupCustomOptions();
+
+        Underclocked.SetupCustomOptions();
 
         VoidBallot.SetupCustomOptions();
 
@@ -1117,6 +1133,8 @@ public static class Options
         ApplyModeratorList = BooleanOptionItem.Create(60120, "ApplyModeratorList", false, TabGroup.SystemSettings, false);
         AllowSayCommand = BooleanOptionItem.Create(60121, "AllowSayCommand", false, TabGroup.SystemSettings, false)
             .SetParent(ApplyModeratorList);
+        ApplyExclusiveList = BooleanOptionItem.Create(60130, "ApplyExclusiveList", true, TabGroup.SystemSettings, true).SetHeader(true);
+        ApplySpecialList = BooleanOptionItem.Create(60122, "ApplySpecialList", true, TabGroup.SystemSettings, true).SetHeader(true);
         //ApplyReminderMsg = BooleanOptionItem.Create(60130, "ApplyReminderMsg", false, TabGroup.SystemSettings, false);
         /*TimeForReminder = IntegerOptionItem.Create(60131, "TimeForReminder", new(0, 99, 1), 3, TabGroup.SystemSettings, false)
             .SetParent(TimeForReminder)

@@ -37,11 +37,11 @@ public class GameSettingMenuPatch
             {
                 TabGroup.SystemSettings => Main.ModColor,
                 TabGroup.ModSettings => "#59ef83",
-                TabGroup.ModifierSettings => "#EF59AF",
+                TabGroup.ModifierSettings => "#fc7f03",
                 TabGroup.ImpostorRoles => "#f74631",
                 TabGroup.CrewmateRoles => "#8cffff",
                 TabGroup.NeutralRoles => "#7f8c8d",
-                TabGroup.Addons => "#ff9ace",
+                TabGroup.Addons => "#7a521d",
                 _ => "#ffffff",
             };
             label.fontStyle = FontStyles.UpperCase;

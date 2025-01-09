@@ -10,7 +10,7 @@ internal class Deputy : RoleBase
     //===========================SETUP================================\\
     private const int Id = 7800;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateHindering;
     //==================================================================\\
 
     private static OptionItem HandcuffCooldown;

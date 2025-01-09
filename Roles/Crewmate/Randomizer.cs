@@ -14,7 +14,7 @@ internal class Randomizer : RoleBase
     public static bool HasEnabled => playerIdList.Any();
     
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateHindering;
     //==================================================================\\
 
     public static OptionItem BecomeBaitDelayNotify;

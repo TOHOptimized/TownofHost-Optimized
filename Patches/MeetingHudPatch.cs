@@ -398,7 +398,7 @@ class CheckForEndVotingPatch
         if (CustomRoles.Bard.RoleExist())
         {
             Main.BardCreations++;
-            try { name = ModUpdater.Get("https://v1.hitokoto.cn/?encode=text"); }
+            try { name = ("BARDIC INSPIRATIOOONNNN!"); }
             catch { name = GetString("ByBardGetFailed"); }
             name += "\n\t\t——" + GetString("ByBard");
             goto EndOfSession;
@@ -735,7 +735,9 @@ static class ExtendedMeetingHud
 
                 // Madmate assign by vote
                 if (ps.TargetPlayerId == ps.VotedFor && Madmate.MadmateSpawnMode.GetInt() == 2) VoteNum = 0;
-
+                
+                if (CheckForEndVotingPatch.CheckRole(ps.VotedFor, CustomRoles.Evader)) VoteNum = 0;
+                
                 if (CheckForEndVotingPatch.CheckRole(ps.TargetPlayerId, CustomRoles.VoidBallot)) VoteNum = 0;
 
                 if (Jailer.IsTarget(ps.VotedFor) || Jailer.IsTarget(ps.TargetPlayerId)) VoteNum = 0; //jailed can't vote and can't get voted
@@ -856,6 +858,10 @@ class MeetingHudStartPatch
             if (Sleuth.SleuthNotify.ContainsKey(pc.PlayerId))
                 AddMsg(Sleuth.SleuthNotify[pc.PlayerId], pc.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Sleuth), GetString("SleuthNoticeTitle")));
 
+            // Identifier notify msg
+            if (Identifier.IdentifierNotify.ContainsKey(pc.PlayerId))
+                AddMsg(Identifier.IdentifierNotify[pc.PlayerId], pc.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Identifier), GetString("IdentifierNoticeTitle")));
+            
             // Check Mimic kill
             if (pc.Is(CustomRoles.Mimic) && !pc.IsAlive())
                 Main.AllAlivePlayerControls.Where(x => x.GetRealKiller()?.PlayerId == pc.PlayerId).Do(x => MimicMsg += $"\n{x.GetNameWithRole(true)}");
@@ -886,6 +892,8 @@ class MeetingHudStartPatch
         
         Cyber.Clear();
         Sleuth.Clear();
+        Identifier.Clear();
+        // Informable.Clear();
     }
     public static void Prefix(/*MeetingHud __instance*/)
     {
@@ -1037,7 +1045,7 @@ class MeetingHudStartPatch
             // Guesser Mode //
             if (Options.GuesserMode.GetBool())
             {
-                if (Options.CrewmatesCanGuess.GetBool() && seer.GetCustomRole().IsCrewmate() && !seer.Is(CustomRoles.Judge) && !seer.Is(CustomRoles.Lookout) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Inspector))
+                if (Options.CrewmatesCanGuess.GetBool() && seer.GetCustomRole().IsCrewmate() && !seer.Is(CustomRoles.Judge) && !seer.Is(CustomRoles.Technician) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Inspector))
                     if (!seer.Data.IsDead && !target.Data.IsDead)
                         pva.NameText.text = Utils.ColorString(Utils.GetRoleColor(seer.GetCustomRole()), target.PlayerId.ToString()) + " " + pva.NameText.text;
                 if (Options.ImpostorsCanGuess.GetBool() && (seer.GetCustomRole().IsImpostor() || seer.GetCustomRole().IsMadmate()) && !seer.Is(CustomRoles.Councillor))

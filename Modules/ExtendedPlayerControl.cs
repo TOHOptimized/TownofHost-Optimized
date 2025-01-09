@@ -4,6 +4,7 @@ using InnerNet;
 using System;
 using System.Text;
 using TOHE.Modules;
+using TOHE.Roles._Ghosts_.Crewmate;
 using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.AddOns.Impostor;
 using TOHE.Roles.Core;
@@ -222,7 +223,7 @@ static class ExtendedPlayerControl
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
 
-    public static void RpcGuardAndKill(this PlayerControl killer, PlayerControl target = null, int colorId = 0, bool forObserver = false)
+    public static void RpcGuardAndKill(this PlayerControl killer, PlayerControl target = null, int colorId = 0, bool forTechnician = false)
     {
         if (!AmongUsClient.Instance.AmHost)
         {
@@ -236,10 +237,10 @@ static class ExtendedPlayerControl
 
         if (target == null) target = killer;
 
-        // Check Observer
-        if (Observer.HasEnabled && !forObserver && !MeetingStates.FirstMeeting)
+        // Check Technician
+        if (Technician.HasEnabled && !forTechnician && !MeetingStates.FirstMeeting)
         {
-            Observer.ActivateGuardAnimation(killer.PlayerId, target, colorId);
+            Technician.ActivateGuardAnimation(killer.PlayerId, target, colorId);
         }
 
         // Host
@@ -296,10 +297,10 @@ static class ExtendedPlayerControl
                 writer.Write(time);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
             }
-            // Check Observer
-            if (Observer.HasEnabled)
+            // Check Technician
+            if (Technician.HasEnabled)
             {
-                Observer.ActivateGuardAnimation(target.PlayerId, target, 11);
+                Technician.ActivateGuardAnimation(target.PlayerId, target, 11);
             }
         }
         player.ResetKillCooldown();
@@ -401,10 +402,10 @@ static class ExtendedPlayerControl
                 writer.Write(time);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
             }
-            // Check Observer
-            if (Observer.HasEnabled)
+            // Check Technician
+            if (Technician.HasEnabled)
             {
-                Observer.ActivateGuardAnimation(target.PlayerId, target, 11);
+                Technician.ActivateGuardAnimation(target.PlayerId, target, 11);
             }
         }
         player.ResetKillCooldown();
@@ -737,7 +738,11 @@ static class ExtendedPlayerControl
                     case CustomRoles.Overclocked:
                         Main.AllPlayerKillCooldown[player.PlayerId] -= Main.AllPlayerKillCooldown[player.PlayerId] * (Overclocked.OverclockedReduction.GetFloat() / 100);
                         break;
-
+  
+                    case CustomRoles.Underclocked:
+                        Main.AllPlayerKillCooldown[player.PlayerId] += Main.AllPlayerKillCooldown[player.PlayerId] * (Underclocked.UnderclockedIncrease.GetFloat() / 100);
+                        break;
+                        
                     case CustomRoles.Diseased:
                         Diseased.IncreaseKCD(player);
                         break;
@@ -769,7 +774,8 @@ static class ExtendedPlayerControl
             || sheriff.Is(CustomRoles.Charmed)
             || sheriff.Is(CustomRoles.Infected)
             || sheriff.Is(CustomRoles.Contagious)
-            || sheriff.Is(CustomRoles.Egoist);
+            || sheriff.Is(CustomRoles.Egoist)
+            || sheriff.Is(CustomRoles.Darkened);
     }
     public static bool ShouldBeDisplayed(this CustomRoles subRole)
     {
@@ -782,6 +788,7 @@ static class ExtendedPlayerControl
             CustomRoles.Soulless and not
             CustomRoles.Lovers and not
             CustomRoles.Infected and not
+            CustomRoles.Darkened and not
             CustomRoles.Contagious;
     }
     public static void RpcExileV2(this PlayerControl player)
@@ -1042,6 +1049,19 @@ static class ExtendedPlayerControl
                 logger.Info($"Virus Know Role");
             return true;
         }
+        else if (DarkFairy.KnowRole(seer, target))
+        {
+            if (isVanilla)
+                logger.Info($"Dark Fairy Know Role");
+            return true;
+        }
+        else if (Cursebearer.KnowRole(seer, target))
+        {
+            if (isVanilla)
+                logger.Info($"Cursebearer Know Role");
+            return true;
+        }
+
 
 
         else return false;
@@ -1063,6 +1083,7 @@ static class ExtendedPlayerControl
                 or CustomRoles.Charmed
                 or CustomRoles.Infected
                 or CustomRoles.Contagious
+                or CustomRoles.Darkened
                 or CustomRoles.Egoist) 
             && KnowSubRoleTarget(seer, target))
             return true;
@@ -1088,6 +1109,7 @@ static class ExtendedPlayerControl
         else if (Cultist.HasEnabled && Cultist.KnowRole(seer, target)) return true;
         else if (Infectious.HasEnabled && Infectious.KnowRole(seer, target)) return true;
         else if (Virus.HasEnabled && Virus.KnowRole(seer, target)) return true;
+        else if (DarkFairy.HasEnabled && DarkFairy.KnowRole(seer, target)) return true;
         else if (Jackal.HasEnabled)
         {
             if (seer.Is(CustomRoles.Jackal) || seer.Is(CustomRoles.Recruit))

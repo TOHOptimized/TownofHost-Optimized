@@ -611,6 +611,13 @@ class ShapeshiftPatch
             return;
         }
 
+        foreach (var state in Main.PlayerStates.Values)
+        { 
+            if (state.RoleClass == null) continue;
+
+            state.RoleClass.OnOthersShapeshift();
+        }
+
         Main.CheckShapeshift[shapeshifter.PlayerId] = shapeshifting;
         Main.ShapeshiftTarget[shapeshifter.PlayerId] = target.PlayerId;
 
@@ -922,7 +929,7 @@ class ReportDeadBodyPatch
         
         Sleuth.OnReportDeadBody(player, target);
 
-
+        Identifier.OnReportDeadBody(player, target);
 
         foreach (var pc in Main.AllPlayerControls)
         {
@@ -1055,7 +1062,7 @@ class FixedUpdateInNormalGamePatch
         {
             if (GameStates.IsLobby)
             {
-                bool shouldChangeGamePublic = (ModUpdater.hasUpdate && ModUpdater.forceUpdate) || ModUpdater.isBroken || !Main.AllowPublicRoom || !VersionChecker.IsSupported;
+                bool shouldChangeGamePublic = !Main.AllowPublicRoom || !VersionChecker.IsSupported;
                 if (shouldChangeGamePublic && AmongUsClient.Instance.IsGamePublic)
                 {
                     AmongUsClient.Instance.ChangeGamePublic(false);
@@ -1496,6 +1503,17 @@ class EnterVentPatch
         {
             Unlucky.SuicideRand(pc, Unlucky.StateSuicide.EnterVent);
         }
+    }
+}
+[HarmonyPatch(typeof(Vent), nameof(Vent.ExitVent))]
+class ExitVentPatch
+{
+    public static void Postfix(Vent __instance, [HarmonyArgument(0)] PlayerControl pc)
+    {
+        Logger.Info($" {pc.GetNameWithRole()}, Vent ID: {__instance.Id} ({__instance.name})", "ExitVent");
+
+        if (pc.PlayerId == PlayerControl.LocalPlayer.PlayerId)
+        _ =  new LateTask(() => { HudManager.Instance.SetHudActive(pc, pc.Data.Role, true); }, 0.6f);
     }
 }
 [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.CoExitVent))]

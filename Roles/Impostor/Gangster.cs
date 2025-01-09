@@ -65,6 +65,10 @@ internal class Gangster : RoleBase
         {
             return true;
         }
+        if (target.Is(CustomRoles.Parasite))
+        {
+            return false;
+        }
 
         if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
         {

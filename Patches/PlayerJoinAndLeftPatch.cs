@@ -301,8 +301,10 @@ public static class OnPlayerJoinedPatch
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnPlayerLeft))]
 class OnPlayerLeftPatch
 {
+    public static bool StartingProcessing = false;
     static void Prefix([HarmonyArgument(0)] ClientData data)
     {
+        StartingProcessing = true;
         if (GameStates.IsInGame)
         {
             Main.PlayerStates[data.Character.PlayerId].Disconnected = true;
@@ -378,14 +380,6 @@ class OnPlayerLeftPatch
                     NameNotifyManager.Notice.Remove(data.Character.PlayerId);
                     Utils.DoNotifyRoles(SpecifyTarget: data.Character, ForceLoop: true);
                 }
-
-                try
-                {
-                    if (AmongUsClient.Instance.AmHost)
-                        data.Character.RpcSetName(data.Character.GetRealName(isMeeting: true));
-                }
-                catch
-                { }
 
                 AntiBlackout.OnDisconnect(data.Character.Data);
                 PlayerGameOptionsSender.RemoveSender(data.Character);
@@ -518,6 +512,7 @@ class OnPlayerLeftPatch
             Logger.Error(error.ToString(), "OnPlayerLeftPatch.Postfix");
             //Logger.SendInGame("Error: " + error.ToString());
         }
+        StartingProcessing = false;
     }
 }
 [HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.Spawn))]

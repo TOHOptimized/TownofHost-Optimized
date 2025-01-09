@@ -900,7 +900,12 @@ public static class GuessManager
                     if (!listOfRoles.Contains(CustomRoles.Admired))
                         listOfRoles.Add(CustomRoles.Admired);
                 }
-
+                
+                if (CustomRoles.DarkFairy.IsEnable())
+                {
+                    if (!listOfRoles.Contains(CustomRoles.Darkened))
+                        listOfRoles.Add(CustomRoles.Darkened);
+                }
                 arrayOfRoles = [.. listOfRoles];
             }
             else

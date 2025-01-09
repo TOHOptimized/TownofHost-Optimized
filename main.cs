@@ -19,7 +19,7 @@ using UnityEngine;
 [assembly: AssemblyVersion(TOHE.Main.PluginVersion)]
 namespace TOHE;
 
-[BepInPlugin(PluginGuid, "TOHE", PluginVersion)]
+[BepInPlugin(PluginGuid, "TOHO", PluginVersion)]
 [BepInIncompatibility("jp.ykundesu.supernewroles")]
 [BepInProcess("Among Us.exe")]
 public class Main : BasePlugin
@@ -27,9 +27,9 @@ public class Main : BasePlugin
     // == プログラム設定 / Program Config ==
     public const string OriginalForkId = "OriginalTOH";
 
-    public static readonly string ModName = "TOHO";
+    public static readonly string ModName = "Town of Host: Optimized";
     public static readonly string ForkId = "TOHO";
-    public static readonly string ModColor = "#ffc0cb";
+    public static readonly string ModColor = "#b47ede";
     public static readonly bool AllowPublicRoom = true;
 
     public static HashAuth DebugKeyAuth { get; private set; }
@@ -39,24 +39,24 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.Limeau.townofhostoptimized";
-    public const string PluginVersion = "2024.0709.200.09000"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.0.0";
-    public const string SupportedVersionAU = "2024.6.18";
+    public const string PluginVersion = "2024.0908.131.00000"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.3.1";
+    public const string SupportedVersionAU = "2024.8.13";
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool Canary = true; // ACTIVE - Latest: V2.0.0 Canary 9
-    public static readonly bool fullRelease = false; // INACTIVE - Latest: V1.6.0
-    public static readonly bool devRelease = false; // INACTIVE - Latest: V2.0.0 Dev 25
+    public static readonly bool Canary = false; // INACTIVE - Latest: (TOHE) V2.0.0 Canary 9
+    public static readonly bool fullRelease = true; // ACTIVE - Latest: V1.0.1
+    public static readonly bool devRelease = false; // INACTIVE - Latest: (TOHE) V2.0.0 Dev 25
 
     public static bool hasAccess = true;
 
-    public static readonly bool ShowUpdateButton = true;
+    public static readonly bool ShowUpdateButton = false;
 
     public static readonly bool ShowGitHubButton = true;
     public static readonly string GitHubInviteUrl = "https://github.com/Limeau/TownofHost-Optimized";
 
     public static readonly bool ShowDiscordButton = true;
-    public static readonly string DiscordInviteUrl = "https://discord.gg/imphq";
+    public static readonly string DiscordInviteUrl = "https://discord.gg/tohoptimized";
 
     public static readonly bool ShowWebsiteButton = false;
     public static readonly string WebsiteInviteUrl = "https://tohre.dev";
@@ -565,9 +565,11 @@ public enum CustomRoles
     Minion,
 
     //Impostor
+    Agent,
     Anonymous,
     AntiAdminer,
     Arrogance,
+    Bane,
     Bard,
     Berserker,
     Blackmailer,
@@ -599,6 +601,7 @@ public enum CustomRoles
     Godfather,
     Greedy,
     Hangman,
+    Hypnotist,
     Inhibitor,
     Instigator,
     Kamikaze,
@@ -641,6 +644,7 @@ public enum CustomRoles
     Zombie,
 
     //Crewmate Ghost
+    Cursebearer,
     Ghastly,
     Hawk,
     Warden,
@@ -677,7 +681,6 @@ public enum CustomRoles
     Knight, 
     LazyGuy,
     Lighter,
-    Lookout,
     Marshall,
     Mayor,
     Mechanic, 
@@ -689,16 +692,17 @@ public enum CustomRoles
     Mortician,
     NiceGuesser,
     NiceMini,
-    Observer,
     Oracle,
     Overseer, 
     Pacifist, 
     ChiefOfPolice, //police commisioner ///// UNUSED
     President,
+    Protector,
     Psychic,
     Randomizer,
     Reverie,
     Retributionist,
+    Savior,
     Sheriff,
     Snitch,
     SpeedBooster,
@@ -707,6 +711,7 @@ public enum CustomRoles
     SuperStar,
     Swapper,
     TaskManager,
+    Technician,
     Telecommunication,
     Tracefinder,
     //Tracker,
@@ -723,6 +728,7 @@ public enum CustomRoles
     Amnesiac,
     Arsonist,
     Artist,
+    Assassin,
     Bandit,
     BloodKnight,
     Collector,
@@ -746,9 +752,11 @@ public enum CustomRoles
     Jester,
     Jinx,
     Juggernaut,
+    Laborer, 
     Lawyer,
     Maverick,
     Medusa,
+    Narc,
     Necromancer,
     Opportunist,
     Pelican,
@@ -766,6 +774,7 @@ public enum CustomRoles
     Pursuer,
     Pyromaniac,
     Quizmaster,
+    Repellant, 
     Revolutionist,
     Romantic,
     RuthlessRomantic,
@@ -783,6 +792,7 @@ public enum CustomRoles
     Taskinator,
     Terrorist,
     Traitor,
+    Vaporizer,
     Vector,
     VengefulRomantic,
     Virus,
@@ -790,6 +800,7 @@ public enum CustomRoles
     Werewolf,
     Workaholic,
     Wraith,
+    Keymaster,
 
    //two-way camp
     Mini,
@@ -819,7 +830,7 @@ public enum CustomRoles
     Cleansed,
     Clumsy,
     Contagious,
-    Converted,
+    Darkened,
     Cyber,
     Unreportable, //disregarded
     Diseased,
@@ -834,8 +845,10 @@ public enum CustomRoles
     Gravestone,
     Guesser,
     Hurried,
+    Identifier,
     Infected,
     Influenced,
+    Informable,
     Knighted,
     LastImpostor,
     Lazy,
@@ -860,6 +873,7 @@ public enum CustomRoles
     Reach,
     Rebound,
     Recruit,
+    Revealed,
     Seer,
     Silent,
     Statue,
@@ -873,11 +887,12 @@ public enum CustomRoles
     Torch,
     Trapper,
     Tired,
+    Underclocked,
     Unlucky,
     VoidBallot,
     Watcher,
     Workhorse,
-    Youtuber   
+    Youtuber,
 }
 //WinData
 public enum CustomWinner
@@ -947,6 +962,11 @@ public enum CustomWinner
     Doppelganger = CustomRoles.Doppelganger,
     Solsticer = CustomRoles.Solsticer,
     DarkFairy = CustomRoles.DarkFairy,
+    Assassin = CustomRoles.Assassin,
+    Vaporizer = CustomRoles.Vaporizer,
+    Keymaster = CustomRoles.Keymaster,
+    Narc = CustomRoles.Narc,
+    Artist = CustomRoles.Artist,
 }
 public enum AdditionalWinners
 {
@@ -972,6 +992,9 @@ public enum AdditionalWinners
     Pixie = CustomRoles.Pixie,
     Quizmaster = CustomRoles.Quizmaster,
     SchrodingersCat = CustomRoles.SchrodingersCat,
+    Repellant = CustomRoles.Repellant,
+    Laborer = CustomRoles.Laborer,
+    Keymaster = CustomRoles.Keymaster,
     //   NiceMini = CustomRoles.NiceMini,
     //   Baker = CustomRoles.Baker,
 }

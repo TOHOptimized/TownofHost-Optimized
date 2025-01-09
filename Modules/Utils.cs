@@ -500,6 +500,7 @@ public static class Utils
                             case CustomRoles.Infected:
                             case CustomRoles.Contagious:
                             case CustomRoles.Admired:
+                            case CustomRoles.Darkened:
                                 RoleColor = GetRoleColor(subRole);
                                 RoleText = GetRoleString($"{subRole}-") + RoleText;
                                 break;
@@ -589,6 +590,7 @@ public static class Utils
                 case CustomRoles.Contagious:
                 case CustomRoles.Soulless:
                 case CustomRoles.Rascal:
+                case CustomRoles.Darkened:
                     //Lovers don't count the task as a win
                     hasTasks &= !ForRecompute;
                     break;
@@ -955,7 +957,7 @@ public static class Utils
         {
             if (role is CustomRoles.NotAssigned or
                         CustomRoles.LastImpostor) continue;
-            if (summary && role is CustomRoles.Madmate or CustomRoles.Charmed or CustomRoles.Recruit or CustomRoles.Admired or CustomRoles.Infected or CustomRoles.Contagious or CustomRoles.Soulless) continue;
+            if (summary && role is CustomRoles.Madmate or CustomRoles.Charmed or CustomRoles.Recruit or CustomRoles.Admired or CustomRoles.Infected or CustomRoles.Contagious or CustomRoles.Soulless or CustomRoles.Darkened) continue;
 
             var RoleColor = GetRoleColor(role);
             var RoleText = disableColor ? GetRoleName(role) : ColorString(RoleColor, GetRoleName(role));
@@ -1355,6 +1357,20 @@ public static class Utils
         var friendCodes = File.ReadAllLines(friendCodesFilePath);
         return friendCodes.Any(code => code.Contains(friendCode));
     }
+    public static bool IsPlayerExclusive(string friendCode)
+    {
+        if (friendCode == "") return false;
+        var friendCodesFilePath = @"./TOHE-DATA/Exclusive-List.txt";
+        var friendCodes = File.ReadAllLines(friendCodesFilePath);
+        return friendCodes.Any(code => code.Contains(friendCode));
+    }
+    public static bool IsPlayerSpecial(string friendCode)
+    {
+        if (friendCode == "") return false;
+        var friendCodesFilePath = @"./TOHE-DATA/Special-List.txt";
+        var friendCodes = File.ReadAllLines(friendCodesFilePath);
+        return friendCodes.Any(code => code.Contains(friendCode));
+    }
     public static bool CheckColorHex(string ColorCode)
     {
         Regex regex = new("^[0-9A-Fa-f]{6}$");
@@ -1422,7 +1438,7 @@ public static class Utils
 
         if (!(player.AmOwner || player.FriendCode.GetDevUser().HasTag()))
         {
-            if (!IsPlayerModerator(player.FriendCode) && !IsPlayerVIP(player.FriendCode))
+            if (!IsPlayerModerator(player.FriendCode) && !IsPlayerVIP(player.FriendCode) && !IsPlayerExclusive(player.FriendCode) && !IsPlayerSpecial(player.FriendCode))
             {
                 string name1 = Main.AllPlayerNames.TryGetValue(player.PlayerId, out var n1) ? n1 : "";
                 if (GameStates.IsLobby && name1 != player.name && player.CurrentOutfitType == PlayerOutfitType.Default) player.RpcSetName(name1);
@@ -1455,6 +1471,7 @@ public static class Utils
                 if (Options.CurrentGameMode == CustomGameMode.FFA)
                     name = $"<color=#00ffff><size=1.7>{GetString("ModeFFA")}</size></color>\r\n" + name;
             }
+
             var modtag = "";
             if (Options.ApplyVipList.GetValue() == 1 && player.FriendCode != PlayerControl.LocalPlayer.FriendCode)
             {
@@ -1497,6 +1514,94 @@ public static class Utils
                         if (startColorCode == endColorCode) modtag = $"<color=#{startColorCode}>{GetString("VipTag")}</color>";
 
                         else modtag = GradientColorText(startColorCode, endColorCode, GetString("VipTag"));
+                    }
+                }
+            }
+            if (Options.ApplyExclusiveList.GetValue() == 1 && player.FriendCode != PlayerControl.LocalPlayer.FriendCode)
+            {
+                if (IsPlayerExclusive(player.FriendCode))
+                {
+                    string colorFilePath = @$"./TOHE-DATA/Tags/EXCLUSIVE_TAGS/{player.FriendCode}.txt";
+                    //static color
+                    if (!Options.GradientTagsOpt.GetBool())
+                    {
+                        string startColorCode = "ffff00";
+                        if (File.Exists(colorFilePath))
+                        {
+                            string ColorCode = File.ReadAllText(colorFilePath);
+                            _ = ColorCode.Trim();
+                            if (CheckColorHex(ColorCode)) startColorCode = ColorCode;
+                        }
+                        //"ffff00"
+                        modtag = $"<color=#{startColorCode}>{GetString("ExclusiveTag")}</color>";
+                    }
+                    else //gradient color
+                    {
+                        string startColorCode = "ffff00";
+                        string endColorCode = "ffff00";
+                        string ColorCode = "";
+                        if (File.Exists(colorFilePath))
+                        {
+                            ColorCode = File.ReadAllText(colorFilePath);
+                            if (ColorCode.Split(" ").Length == 2)
+                            {
+                                startColorCode = ColorCode.Split(" ")[0];
+                                endColorCode = ColorCode.Split(" ")[1];
+                            }
+                        }
+                        if (!CheckGradientCode(ColorCode))
+                        {
+                            startColorCode = "ffff00";
+                            endColorCode = "ffff00";
+                        }
+                        //"33ccff", "ff99cc"
+                        if (startColorCode == endColorCode) modtag = $"<color=#{startColorCode}>{GetString("ExclusiveTag")}</color>";
+
+                        else modtag = GradientColorText(startColorCode, endColorCode, GetString("ExclusiveTag"));
+                    }
+                }
+            }
+            if (Options.ApplySpecialList.GetValue() == 1 && player.FriendCode != PlayerControl.LocalPlayer.FriendCode)
+            {
+                if (IsPlayerSpecial(player.FriendCode))
+                {
+                    string colorFilePath = @$"./TOHE-DATA/Tags/SPECIAL_TAGS/{player.FriendCode}.txt";
+                    //static color
+                    if (!Options.GradientTagsOpt.GetBool())
+                    { 
+                        string startColorCode = "ffff00";
+                        if (File.Exists(colorFilePath))
+                        {
+                            string ColorCode = File.ReadAllText(colorFilePath);
+                            _ = ColorCode.Trim();
+                            if (CheckColorHex(ColorCode)) startColorCode = ColorCode;
+                        }
+                        //"ffff00"
+                        modtag = $"<color=#{startColorCode}>{GetString("SpecialTag")}</color>";
+                        }
+                    else //gradient color
+                    {
+                        string startColorCode = "ffff00";
+                        string endColorCode = "ffff00";
+                        string ColorCode = "";
+                        if (File.Exists(colorFilePath))
+                        {
+                            ColorCode = File.ReadAllText(colorFilePath);
+                            if (ColorCode.Split(" ").Length == 2)
+                            {
+                                startColorCode = ColorCode.Split(" ")[0];
+                                endColorCode = ColorCode.Split(" ")[1];
+                            }
+                        }
+                        if (!CheckGradientCode(ColorCode))
+                        {
+                            startColorCode = "ffff00";
+                            endColorCode = "ffff00";
+                        }
+                        //"33ccff", "ff99cc"
+                        if (startColorCode == endColorCode) modtag = $"<color=#{startColorCode}>{GetString("SpecialTag")}</color>";
+
+                        else modtag = GradientColorText(startColorCode, endColorCode, GetString("SpecialTag"));
                     }
                 }
             }
@@ -1560,9 +1665,28 @@ public static class Utils
                 };
             }
 
-            if (!name.Contains($"\r\r") && player.FriendCode.GetDevUser().HasTag() && (player.AmOwner || player.IsModClient()))
+            DevUser devUser = player.FriendCode.GetDevUser();
+            bool hasTag = devUser.HasTag();
+            if (hasTag)
             {
-                name = player.FriendCode.GetDevUser().GetTag() + "<size=1.5>" + modtag + "</size>" + name;
+                string tag = hasTag ? devUser.GetTag() : string.Empty;
+                if (tag == "null") tag = string.Empty;
+                if (player.AmOwner || player.IsModClient())
+                {
+                    var modTagModded = $"<size=1.4>{GetString("ModeratorTag")}\r\n</size>";
+                    var vipTagModded = $"<size=1.4>{GetString("VIPTag")}\r\n</size>";
+                    var exclusiveTagModded = $"<size=1.4>{GetString("ExclusiveTag")}\r\n</size>";
+                    var specialTagModded = $"<size=1.4>{GetString("SpecialTag")}\r\n</size>";
+                    name = $"{(hasTag ? tag : string.Empty)}{name}";
+                }
+                else
+                {
+                    var modTagVanilla = $"<size=1.4>{GetString("ModeratorTag")} - </size>";
+                    var vipTagVanilla = $"<size=1.4>{GetString("VIPTag")} - </size>";
+                    var exclusiveTagVanilla = $"<size=1.4>{GetString("ExclusiveTag")} - </size>";
+                    var specialTagVanilla = $"<size=1.4>{GetString("SpecialTag")} - </size>";
+                    name = $"{(hasTag ? tag.Replace("\r\n", " | ") : string.Empty)}{name}";
+                }
             }
             else name = modtag + name;
         }
@@ -1611,9 +1735,8 @@ public static class Utils
     private static readonly StringBuilder TargetMark = new(20);
     public static async void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false)
     {
-        if (!AmongUsClient.Instance.AmHost) return;
+        if (!AmongUsClient.Instance.AmHost  || GameStates.IsHideNSeek || OnPlayerLeftPatch.StartingProcessing) return;
         if (Main.AllPlayerControls == null) return;
-        if (GameStates.IsHideNSeek) return;
 
         //Do not update NotifyRoles during meetings
         if (GameStates.IsMeeting && !GameEndCheckerForNormal.ShowAllRolesWhenGameEnd) return;
@@ -1628,9 +1751,8 @@ public static class Utils
     }
     public static Task DoNotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false)
     {
-        if (!AmongUsClient.Instance.AmHost) return Task.CompletedTask;
+        if (!AmongUsClient.Instance.AmHost  || GameStates.IsHideNSeek || OnPlayerLeftPatch.StartingProcessing) return Task.CompletedTask;
         if (Main.AllPlayerControls == null) return Task.CompletedTask;
-        if (GameStates.IsHideNSeek) return Task.CompletedTask;
 
         //Do not update NotifyRoles during meetings
         if (GameStates.IsMeeting && !GameEndCheckerForNormal.ShowAllRolesWhenGameEnd) return Task.CompletedTask;
@@ -1956,7 +2078,7 @@ public static class Utils
                                     var GetTragetId = ColorString(GetRoleColor(seer.GetCustomRole()), target.PlayerId.ToString()) + " " + TargetPlayerName;
 
                                     //Crewmates
-                                    if (Options.CrewmatesCanGuess.GetBool() && seer.GetCustomRole().IsCrewmate() && !seer.Is(CustomRoles.Judge) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Lookout) && !seer.Is(CustomRoles.Swapper))
+                                    if (Options.CrewmatesCanGuess.GetBool() && seer.GetCustomRole().IsCrewmate() && !seer.Is(CustomRoles.Judge) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Technician) && !seer.Is(CustomRoles.Swapper))
                                         TargetPlayerName = GetTragetId;
 
                                     else if (seer.Is(CustomRoles.NiceGuesser) && !Options.CrewmatesCanGuess.GetBool())
@@ -1986,7 +2108,7 @@ public static class Utils
                                 if (seer.IsAlive() && target.IsAlive())
                                 {
                                     if (seer.Is(CustomRoles.NiceGuesser) || seer.Is(CustomRoles.EvilGuesser) ||
-                                        (seer.Is(CustomRoles.Guesser) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Lookout)))
+                                        (seer.Is(CustomRoles.Guesser) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Technician)))
                                         TargetPlayerName = ColorString(GetRoleColor(seer.GetCustomRole()), target.PlayerId.ToString()) + " " + TargetPlayerName;
                                 }
                             }
@@ -2107,6 +2229,9 @@ public static class Utils
             var Breason when BannedReason(Breason) => false,
             PlayerState.DeathReason.Slice => CustomRoles.Hawk.IsEnable(),
             PlayerState.DeathReason.BloodLet => CustomRoles.Bloodmoon.IsEnable(),
+            PlayerState.DeathReason.Vaporized => CustomRoles.Vaporizer.IsEnable(),
+            PlayerState.DeathReason.Toxined => CustomRoles.Bane.IsEnable(),
+            PlayerState.DeathReason.Arrested => CustomRoles.Narc.IsEnable(),
             PlayerState.DeathReason.Kill => true,
             _ => true,
         };

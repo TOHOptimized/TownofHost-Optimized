@@ -38,7 +38,7 @@ public class PlayerState(byte playerId)
 
         var pc = GetPlayerById(PlayerId);
 
-        if (role == CustomRoles.Opportunist)
+        if (role == CustomRoles.Opportunist || role == CustomRoles.Repellant)
         {
             if (AmongUsClient.Instance.AmHost)
             {
@@ -96,6 +96,16 @@ public class PlayerState(byte playerId)
             {
                 0 => CountTypes.OutOfGame,
                 1 => CountTypes.Virus,
+                2 => countTypes,
+                _ => throw new NotImplementedException()
+            };
+        }
+        if (pc.Is(CustomRoles.Darkened))
+        {
+            countTypes = DarkFairy.DarkenedCountMode.GetInt() switch
+            {
+                0 => CountTypes.OutOfGame,
+                1 => CountTypes.DarkFairy,
                 2 => countTypes,
                 _ => throw new NotImplementedException()
             };
@@ -193,6 +203,16 @@ public class PlayerState(byte playerId)
                 };
                 break;
 
+            case CustomRoles.Darkened:
+                countTypes = DarkFairy.DarkenedCountMode.GetInt() switch
+                {
+                    0 => CountTypes.OutOfGame,
+                    1 => CountTypes.DarkFairy,
+                    2 => countTypes,
+                    _ => throw new NotImplementedException()
+                };
+                break;
+
             // This exist as it would be possible for them to exist on the same player via Bandit
             // But since Bandit can't vent without Nimble, allowing them to have Circumvent is pointless
             case CustomRoles.Nimble:
@@ -284,6 +304,9 @@ public class PlayerState(byte playerId)
         Slice,
         BloodLet,
         WrongAnswer,
+        Vaporized,
+        Toxined,
+        Arrested,
 
         //Please add all new roles with deathreason & new deathreason in Utils.DeathReasonIsEnable();
         etc = -1,

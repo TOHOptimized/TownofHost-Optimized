@@ -44,6 +44,12 @@ public abstract class RoleBase
     }
 
     /// <summary>
+    /// Used to determine when other player shapeshifts.
+    /// </summary>
+    public virtual void OnOthersShapeshift()
+    { }
+
+    /// <summary>
     /// Variable resets when the game starts.
     /// </summary>
     public virtual void Init()

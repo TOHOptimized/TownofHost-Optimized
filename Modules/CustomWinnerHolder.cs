@@ -65,6 +65,9 @@ public static class CustomWinnerHolder
                 case CustomRoles.Recruit:
                     ResetAndSetWinner(CustomWinner.Jackal); 
                     return true;
+                case CustomRoles.Darkened:
+                    ResetAndSetWinner(CustomWinner.DarkFairy);
+                    return true;
                 case CustomRoles.Charmed:
                     ResetAndSetWinner(CustomWinner.Cultist); 
                     return true;

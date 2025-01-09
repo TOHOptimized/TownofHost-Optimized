@@ -62,7 +62,7 @@ public class GameStartManagerPatch
             if (!AmongUsClient.Instance.AmHost) return;
 
             // Make Public Button
-            if (ModUpdater.isBroken || (ModUpdater.hasUpdate && ModUpdater.forceUpdate) || !Main.AllowPublicRoom || !VersionChecker.IsSupported)
+            if (!Main.AllowPublicRoom || !VersionChecker.IsSupported)
             {
                 //__instance.HostPublicButton.activeTextColor = Palette.DisabledClear;
                 //__instance.hj.color = Palette.DisabledClear;

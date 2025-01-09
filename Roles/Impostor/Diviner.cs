@@ -1,6 +1,7 @@
 using AmongUs.GameOptions;
 using static TOHE.Options;
 using static TOHE.Translator;
+using static UnityEngine.GraphicsBuffer;
 
 namespace TOHE.Roles.Impostor;
 
@@ -29,7 +30,7 @@ internal class Diviner : RoleBase
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Diviner, 1, zeroOne: false);
+        SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Diviner);
         KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 20f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Diviner])
             .SetValueFormat(OptionFormat.Seconds);
         RevengeTime = IntegerOptionItem.Create(Id + 11, "DivinerRevengeTime", new(0, 60, 1), 30, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Diviner])
@@ -80,17 +81,47 @@ internal class Diviner : RoleBase
 
         return false;
     }
+        public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    {
+        if (killer == null || target == null || !killer.IsAlive()) return false;
+
+        if (!IsRevenge) return true;
+        else if (target == Killer)
+        {
+            Success = true;
+            killer.Notify(GetString("NecromancerSuccess"));
+            killer.SetKillCooldown(KillCooldown.GetFloat() + tempKillTimer);
+            IsRevenge = false;
+            return true;
+        }
+        else
+        {
+            killer.RpcMurderPlayer(killer);
+            return false;
+        }
+    }
     private static void Countdown(int seconds, PlayerControl player)
     {
         var killer = Killer;
-        if (Success)
+        if (Success || !player.IsAlive())
         {
             Timer = RevengeTime.GetInt();
             Success = false;
             Killer = null; 
             return;
         }
-        if (seconds <= 0 || GameStates.IsMeeting && player.IsAlive()) 
+        if (GameStates.IsMeeting && player.IsAlive())
+        {
+            player.SetDeathReason(PlayerState.DeathReason.Kill);
+            player.RpcExileV2();
+            player.Data.IsDead = true;
+            player.Data.MarkDirty();
+            Main.PlayerStates[player.PlayerId].SetDead();
+            player.SetRealKiller(killer);
+            Killer = null;
+            return;
+        }
+        if (seconds <= 0) 
         { 
             player.RpcMurderPlayer(player); 
             player.SetRealKiller(killer);
@@ -101,24 +132,5 @@ internal class Diviner : RoleBase
         Timer = seconds;
 
         _ = new LateTask(() => { Countdown(seconds - 1, player); }, 1.01f, "Diviner Countdown");
-    }
-    public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
-    {
-        if (killer == null || target == null || !killer.IsAlive()) return false;
-
-        if (!IsRevenge) return true;
-        else if (target == Killer)
-        {
-            Success = true;
-            killer.Notify(GetString("DivinerSuccess"));
-            killer.SetKillCooldown(KillCooldown.GetFloat() + tempKillTimer);
-            IsRevenge = false;
-            return true;
-        }
-        else
-        {
-            killer.RpcMurderPlayer(killer);
-            return false;
-        }
     }
 }
