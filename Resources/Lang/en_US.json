@@ -1290,7 +1290,7 @@
   "AutoDisplayKillLog": "Display Kill-log",
   "AutoDisplayLastRoles": "Display Last Roles",
   "AutoDisplayLastResult": "Auto Display Last Result",
-  "RevertOldKillLog": "Revert to old kill-log",
+  "RevertOldKillLog": "Revert to old Kill-log",
 
   "HideExileChat": "Hide exile (lava) Chat",
   "ExileSpamMsg": "Someone is trying to be a smart ass by lava chatting",
@@ -3992,7 +3992,7 @@
 
 "C&R": "Cops & Robbers",
 "CandR": "Cops and Robbers",
-"C&RShortInfo": "<color=#ff8c00Robbers</color> complete tasks, while <color=#007bff>Cops</color> race to capture them!",
+"C&RShortInfo": "<color=#ff8c00>Robbers</color> complete tasks, while <color=#007bff>Cops</color> race to capture them!",
 "ModeDescribe.C&R": "Welcome to the ultimate heist showdown! In this thrilling Among Us Gamemode, players are split into two teams: Cops & Robbers.\n\nAs a Robber, your mission is to stealthily complete all tasks and escape the vigilant eyes of the Cops. If you come across a captured player, simply touch them to set them free! Utilize Vents to activate random abilities that can help you outsmart your pursuers. Teamwork and cunning are key—can you pull off the perfect heist?\n\nAs a Cop, your job is to track down and capture all Robbers before they finish their tasks. Use your Kill button to freeze them in place, and trigger powerful random abilities with your Shapeshift button to turn the tide in your favor. It’s a game of cat and mouse—can you outsmart the Robbers and secure a win for the team?\n\nJoin the chase, strategize with your Crew, and may the best team emerge victorious!",
 "ModeC&R": "Gamemode: Cops & Robbers",
 "Cop": "Cop",
@@ -4075,7 +4075,7 @@
   "SAddTasksPreDeadPlayer": "How many extra short tasks Solsticer gets when a player dies",
   "SolsticerMurdered": "{0} attempted to murder you!",
   "MurderSolsticer": "You stopped Solsticer this round!",
-  "SolsticerMurderMessage": "<b>{0}</b> used Kill button on you last round! Its role is <b>{1}</b>!",
+  "SolsticerMurderMessage": "<b>{0}</b> used Kill button on you last round! Their role is <b>{1}</b>!",
   "SolsticerOnMeeting": "You witnessed too many deaths! Next round you will have {0} more short task!",
   "SolsticerTitle": "SOLSTICER",
   "GuessSolsticer": "Sorry, but you can not guess Solsticer!",
@@ -4156,7 +4156,7 @@
   "QuizmasterAnswers.Engineer": "Engineer",
   "QuizmasterAnswers.GuardianAngel": "GuardianAngel",
 
-  "QuizmasterQuestions.LastSabotage": "What was the Sabotage was called last?",
+  "QuizmasterQuestions.LastSabotage": "What was the Sabotage that was called last?",
   "QuizmasterQuestions.FirstRoundSabotage": "What was the first Sabotage called this round?",
   "QuizmasterQuestions.LastEjectedPlayerColor": "What was the color of the player that was last ejected?",
   "QuizmasterQuestions.LastReportPlayerColor": "What was the color of the body that was last reported before this meeting?",
@@ -4206,7 +4206,7 @@
   "WinnerRoleText.PlagueDoctor": "Plague Scientist Wins!",
 
   "StatueSlow": "Statue Slowness",
-  "StatuePeopleToSlow": "People Needed To Slow",
+  "StatuePeopleToSlow": "People Needed to Slow",
 
   "WardenIncreaseSpeed": "Increase Speed By",
   "WardenWarn": "DANGER! RUN!",
@@ -4218,10 +4218,10 @@
 
   "ShockerAbilityCooldown": "Ability Cooldown",
   "ShockerAbilityDuration": "Ability Duration",
-  "ShockerAbilityPerRound": "Abilities Per Round",
+  "ShockerAbilityPerRound": "Abilities per Round",
   "ShockerShockInVents": "Shock people in Vents",
   "ShockerAbilityResetAfterMeeting": "Reset marked rooms after meeting",
-  "ShockerOutsideRadius": "Radius Of Outside Tasks (not in a room)",
+  "ShockerOutsideRadius": "Radius of Outside Tasks (not in a room)",
   "ShockerCanShockHimself": "Can Shock Himself",
   "ShockerImpostorVision": "Shocker has Impostor vision",
   "ShockerIsShocking": "You're already shocking!",
@@ -4285,7 +4285,7 @@
   "DarkFairyCanDarkenNeutral": "Can darken Neutrals",
 
   "DarkFairy": "Dark Fairy",
-  "DarkFairyInfo": "Convert ALL the players, via your tasks!",
+  "DarkFairyInfo": "Convert ALL players, via your tasks!",
   "DarkFairyInfoLong": "(Neutral):\nAs the Dark Fairy, you can mark tasks to <color=#4B0082>Darken</color> other players. <color=#4B0082>Darkened</color> players know the Dark Fairy, depending on the settings set by the host.\nTo win, Darken as much players as possible and gain the majority.\n\nDepending on the settings you may <color=#4B0082>Darken</color> Neutrals.\nThose you <color=#4B0082>Darken</color> may count as their original team, nothing, or a Dark Fairy to determine when you win due to majority.\nThe Dark Fairy & <color=#4B0082>Darkened</color> team win together.",
 
   "Identifier": "Identifier",
