@@ -1,4 +1,5 @@
 ﻿using Hazel;
+using System.Text;
 using TOHE.Modules;
 using UnityEngine;
 using static TOHE.Translator;
@@ -403,7 +404,7 @@ internal static class FFAManager
         if (target != null && seer.PlayerId != target.PlayerId) return string.Empty;
         if (Main.AllAlivePlayerControls.Length != 2) return string.Empty;
 
-        string arrows = string.Empty;
+        var arrows = new StringBuilder();
         PlayerControl otherPlayer = null;
         foreach (var pc in Main.AllAlivePlayerControls.Where(pc => pc.IsAlive() && pc.PlayerId != seer.PlayerId).ToArray())
         {
@@ -413,9 +414,9 @@ internal static class FFAManager
         if (otherPlayer == null) return string.Empty;
 
         var arrow = TargetArrow.GetArrows(seer, otherPlayer.PlayerId);
-        arrows += Utils.ColorString(Utils.GetRoleColor(CustomRoles.Killer), arrow);
+        arrows.Append(CustomRoles.Killer.GetColoredTextByRole(arrow));
 
-        return arrows;
+        return arrows.ToString();
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
