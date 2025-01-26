@@ -18,10 +18,7 @@ internal class Jinx : CovenManager
     //==================================================================\\
 
     private static OptionItem KillCooldown;
-    //private static OptionItem CanVent;
-    //private static OptionItem HasImpostorVision;
     private static OptionItem JinxSpellTimes;
-    //private static OptionItem killAttacker;
     private static OptionItem CovenCanDieToJinx;
 
 
@@ -32,12 +29,9 @@ internal class Jinx : CovenManager
         SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.Jinx, 1, zeroOne: false);
         KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 20f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx])
             .SetValueFormat(OptionFormat.Seconds);
-        //CanVent = BooleanOptionItem.Create(Id + 11, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx]);
-        //HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx]);
         JinxSpellTimes = IntegerOptionItem.Create(Id + 14, "JinxSpellTimes", new(1, 100, 1), 10, TabGroup.CovenRoles, false)
         .SetParent(CustomRoleSpawnChances[CustomRoles.Jinx])
         .SetValueFormat(OptionFormat.Times);
-        //killAttacker = BooleanOptionItem.Create(Id + 15, GeneralOption.KillAttackerWhenAbilityRemaining, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx]);
         CovenCanDieToJinx = BooleanOptionItem.Create(Id + 16, "JinxCovenCanDieToJinx", true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx]);
 
     }
@@ -51,30 +45,6 @@ internal class Jinx : CovenManager
         JinxedPlayers[playerId] = [];
         playerId.GetPlayer()?.AddDoubleTrigger();
     }
-    /*
-    public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
-    {
-        if (AbilityLimit <= 0) return true;
-        if (killer.IsTransformedNeutralApocalypse()) return true;
-        if (killer == target) return true;
-        
-        killer.RpcGuardAndKill(target);
-        target.RpcGuardAndKill(target);
-       
-        AbilityLimit -= 1;
-        SendSkillRPC();
-
-        if (killAttacker.GetBool() && target.RpcCheckAndMurder(killer, true))
-        {
-            Logger.Info($"{target.GetNameWithRole()}: ability left {AbilityLimit}", "Jinx");
-            killer.SetDeathReason(PlayerState.DeathReason.Jinx);
-            killer.RpcMurderPlayer(killer);
-            killer.SetRealKiller(target);
-        }
-        return false;
-    }
-    */
-    //public override void ApplyGameOptions(IGameOptions opt, byte babushka) => opt.SetVision(HasImpostorVision.GetBool());
     private static bool IsJinxed(byte target)
     {
         if (JinxedPlayers.Count < 1) return false;
@@ -136,7 +106,7 @@ internal class Jinx : CovenManager
         if (!jinx.IsAlive() || jinx.PlayerId == target.PlayerId) return false;
 
         var killerRole = killer.GetCustomRole();
-        // Not should kill
+        // Should not kill
         if (killerRole is CustomRoles.Taskinator
             or CustomRoles.Bodyguard
             or CustomRoles.Veteran
@@ -171,18 +141,17 @@ internal class Jinx : CovenManager
         return false;
     }
     public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
-        => IsJinxed(seen.PlayerId) ? ColorString(GetRoleColor(CustomRoles.Jinx), "⌘") : string.Empty;
+        => IsJinxed(seen.PlayerId) ? CustomRoles.Jinx.GetColoredTextByRole("⌘") : string.Empty;
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
     {
         if (_Player == null) return string.Empty;
         if (IsJinxed(target.PlayerId) && seer.GetCustomRole().IsCovenTeam() && seer.PlayerId != _Player.PlayerId)
         {
-            return ColorString(GetRoleColor(CustomRoles.Jinx), "⌘");
+            return CustomRoles.Jinx.GetColoredTextByRole("⌘");
         }
         return string.Empty;
     }
 
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     public override bool CanUseKillButton(PlayerControl pc) => true;
-    //public override bool CanUseImpostorVentButton(PlayerControl player) => CanVent.GetBool();
 }
