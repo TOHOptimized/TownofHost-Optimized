@@ -223,7 +223,7 @@ internal class ChatCommands
                 case "/末日类中立职业介绍":
                 case "/末日类中立介绍":
                     canceled = true;
-                    Utils.SendMessage(GetString("Message.ApocalypseInfo"), PlayerControl.LocalPlayer.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Apocalypse), GetString("ApocalypseInfoTitle")));
+                    Utils.SendMessage(GetString("Message.ApocalypseInfo"), PlayerControl.LocalPlayer.PlayerId, CustomRoles.Apocalypse.GetColoredTextByRole(GetString("ApocalypseInfoTitle")));
                     break;
 
                 case "/coveninfo":
@@ -232,7 +232,7 @@ internal class ChatCommands
                 case "/巫师阵营介绍":
                 case "/巫师介绍":
                     canceled = true;
-                    Utils.SendMessage(GetString("Message.CovenInfo"), PlayerControl.LocalPlayer.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Coven), GetString("CovenInfoTitle")));
+                    Utils.SendMessage(GetString("Message.CovenInfo"), PlayerControl.LocalPlayer.PlayerId, CustomRoles.Coven.GetColoredTextByRole(GetString("CovenInfoTitle")));
                     break;
 
                 case "/rn":
@@ -1568,7 +1568,7 @@ internal class ChatCommands
                             str = GetString("8BallWithDoubt");
                             break;
                     }
-                    Utils.SendMessage("<align=\"center\"><size=150%>" + str + "</align></size>", PlayerControl.LocalPlayer.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Medium), GetString("8BallTitle")));
+                    Utils.SendMessage("<align=\"center\"><size=150%>" + str + "</align></size>", PlayerControl.LocalPlayer.PlayerId, CustomRoles.Medium.GetColoredTextByRole(GetString("8BallTitle")));
                     break;
                 case "/start":
                 case "/开始":
@@ -2399,12 +2399,15 @@ internal class ChatCommands
             case "/末日中立介绍":
             case "/末日类中立职业介绍":
             case "/末日类中立介绍":
-                Utils.SendMessage(GetString("Message.ApocalypseInfo"), player.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Apocalypse), GetString("ApocalypseInfoTitle")));
+                Utils.SendMessage(GetString("Message.ApocalypseInfo"), player.PlayerId, CustomRoles.Apocalypse.GetColoredTextByRole(GetString("ApocalypseInfoTitle")));
                 break;
 
             case "/coveninfo":
             case "/covinfo":
-                Utils.SendMessage(GetString("Message.CovenInfo"), player.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Coven), GetString("CovenInfoTitle")));
+            case "/巫师阵营职业介绍":
+            case "/巫师阵营介绍":
+            case "/巫师介绍":
+                Utils.SendMessage(GetString("Message.CovenInfo"), player.PlayerId, CustomRoles.Coven.GetColoredTextByRole(GetString("CovenInfoTitle")));
                 break;
 
             case "/rn":
@@ -3446,7 +3449,7 @@ internal class ChatCommands
                         str = GetString("8BallWithDoubt");
                         break;
                 }
-                Utils.SendMessage("<align=\"center\"><size=150%>" + str + "</align></size>", player.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Medium), GetString("8BallTitle")));
+                Utils.SendMessage("<align=\"center\"><size=150%>" + str + "</align></size>", player.PlayerId, CustomRoles.Medium.GetColoredTextByRole(GetString("8BallTitle")));
                 break;
             case "/me":
             case "/我的权限":
