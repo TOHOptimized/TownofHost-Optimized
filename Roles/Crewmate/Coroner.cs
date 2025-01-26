@@ -169,13 +169,13 @@ internal class Coroner : RoleBase
 
         if (CoronerTargets.TryGetValue(seer.PlayerId, out var targets) && targets.Any())
         {
-            var arrows = "";
+            var arrows = new StringBuilder();
             foreach (var targetId in targets)
             {
                 var arrow = TargetArrow.GetArrows(seer, targetId);
-                arrows += ColorString(seer.GetRoleColor(), arrow);
+                arrows.Append(ColorString(seer.GetRoleColor(), arrow));
             }
-            return arrows;
+            return arrows.ToString();
         }
         return ColorString(Color.white, LocateArrow.GetArrows(seer));
     }
