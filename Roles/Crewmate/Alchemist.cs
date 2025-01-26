@@ -383,7 +383,7 @@ internal class Alchemist : RoleBase
         var str = new StringBuilder();
         if (IsInvis(seer.PlayerId))
         {
-            var remainTime = InvisTime[seer.PlayerId] + (long)InvisDuration.GetFloat() - Utils.GetTimeStamp();
+            var remainTime = InvisTime[seer.PlayerId] + (long)InvisDuration.GetFloat() - Utils.TimeStamp;
             str.Append(string.Format(GetString("ChameleonInvisStateCountdown"), remainTime + 1));
         }
         else
@@ -426,7 +426,7 @@ internal class Alchemist : RoleBase
     }
     public override string GetProgressText(byte playerId, bool comms)
     {
-        var player = Utils.GetPlayerById(playerId);
+        var player = playerId.GetPlayer();
         if (player == null || !GameStates.IsInTask) return string.Empty;
 
         var str = new StringBuilder();
