@@ -110,8 +110,8 @@ internal class Mini : RoleBase
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.NiceMini);
                 CustomWinnerHolder.WinnerIds.Add(player.PlayerId);
             }
-            // ↑ This code will show the mini winning player on the checkout screen, Tommy you shouldn't comment it out!
-        } //Is there any need to check this 30 times a second?
+            // ↑ This code will show the Mini winning player on the checkout screen
+        }
 
         if (GameStates.IsMeeting && !CountMeetingTime.GetBool()) return;
 
@@ -128,16 +128,14 @@ internal class Mini : RoleBase
             {
                 player.ResetKillCooldown();
                 player.SyncSettings();
-                //Only sync settings so evil mini's age updates upon next kill attempt or after meeting
+                //Only sync settings so Evil Mini's age updates upon next kill attempt or after meeting
             }
 
             if (player.Is(CustomRoles.NiceMini))
                 player.RpcGuardAndKill();
 
-            /*Dont show guard animation for evil mini,
-            this would simply stop them from murdering.
-            Imagine reseting kill cool down every 20 seconds
-            and evil mini can never kill before age 18*/
+            /*Don't show guard animation for Evil Mini,
+            this would simply stop them from murdering*/
 
             if (UpDateAge.GetBool())
             {
@@ -212,12 +210,8 @@ internal class Mini : RoleBase
         }
     }
 
-    //public override bool OthersKnowTargetRoleColor(PlayerControl seer, PlayerControl target)
-    //    => (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)) && EveryoneCanKnowMini.GetBool();
-
-    //public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target)
-    //    => (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)) && EveryoneCanKnowMini.GetBool() ? Main.roleColors[CustomRoles.Mini] : string.Empty;
-
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target = null, bool isForMeeting = false)
-            => EveryoneCanKnowMini.GetBool() && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)) ? ColorString(GetRoleColor(CustomRoles.Mini), Age != 18 && UpDateAge.GetBool() ? $"({Age})" : string.Empty) : string.Empty;
+            => EveryoneCanKnowMini.GetBool() && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini))
+            ? CustomRoles.Mini.GetColoredTextByRole(Age != 18 && UpDateAge.GetBool() ? Age.ToString() : string.Empty)
+            : string.Empty;
 }
