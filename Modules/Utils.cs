@@ -522,7 +522,8 @@ public static class Utils
                         RoleText = ColorString(GetRoleColor(targetMainRole), RoleText, withoutEnding: true);
 
                         // colored Add-ons
-                        RoleText = ColorString(GetRoleColor(subRole), addBracketsToAddons ? $"({Getname(subRole.ToString())}) " : $"{Getname(subRole.ToString())} ", withoutEnding: true) + RoleText;
+                        foreach (var subRole in targetSubRoles.Where(subRole => subRole.ShouldBeDisplayed() && seer.ShowSubRoleTarget(target, subRole)).ToArray())
+                            RoleText = ColorString(GetRoleColor(subRole), addBracketsToAddons ? $"({Getname(subRole.ToString())}) " : $"{Getname(subRole.ToString())} ", withoutEnding: true) + RoleText;
                     }
                     // default
                     else
@@ -1837,8 +1838,7 @@ public static class Utils
             name.Append(modtag);
             name.Append(oldname);
         }
-        else name = modtag + name;
-
+        
         // Set name
         if (name.ToString() != player.name && player.CurrentOutfitType == PlayerOutfitType.Default)
             player.RpcSetName(name.ToString());
