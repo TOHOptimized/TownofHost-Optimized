@@ -1836,6 +1836,22 @@ class PlayerControlCompleteTaskPatch
 
         if (AmongUsClient.Instance.AmHost)
         {
+            var playerIsOverridden = false;
+            if (TaskManager.GetTaskManager(player.PlayerId, out byte taskManagerId))
+            {
+                var taskManager = taskManagerId.GetPlayer();
+                // check if task manager die after complete task
+                if (taskManager.IsAlive())
+                {
+                    // ovveride player
+                    player = taskManagerId.GetPlayer();
+                    playerIsOverridden = true;
+                }
+                else
+                {
+                    TaskManager.ClearData(player.PlayerId);
+                }
+            }
             var roleClass = player.GetRoleClass();
             // Check task complete for role
             if (roleClass != null)
@@ -1848,6 +1864,12 @@ class PlayerControlCompleteTaskPatch
 
             if (playerTask != null)
                 CustomRoleManager.OthersCompleteThisTask(player, playerTask);
+
+            if (playerIsOverridden)
+            {
+                player = __instance;
+                TaskManager.ClearData(player.PlayerId);
+            }
 
             var playerSubRoles = player.GetCustomSubRoles();
 
