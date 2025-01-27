@@ -303,10 +303,9 @@ internal class Sniper : RoleBase
         }
         return false;
     }
-    public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
+    public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
         if (isForMeeting) return string.Empty;
-        seen ??= seer;
         var sniper = Utils.GetPlayerById(PlayerIdList.First());
         if (!(sniper == seer) || !(sniper == seen)) return string.Empty;
 
