@@ -105,11 +105,10 @@ public static class Translator
                 LoadCustomTranslation($"{lang}.dat", lang);
             }
         }
-    }
 
         // Load all custom translation role names into CrossLangRoleNames
         AttachCustomCrossLangRoleNames();
-    
+    }
     static void MergeJsonIntoTranslationMap(Dictionary<string, Dictionary<int, string>> translationMaps, int languageId, Dictionary<string, string> jsonDictionary)
     {
         foreach (var kvp in jsonDictionary)
@@ -437,7 +436,7 @@ public static class Translator
 
             foreach (var lang in EnumHelper.GetAllValues<SupportedLangs>())
             {
-                var name = GetString($"{item.Key}", lang).ToLower().Trim().Replace(" ", string.Empty);
+                var name = GetString($"{role}", lang).ToLower().Trim().Replace(" ", string.Empty);
                 if (!CrossLangRoleNames[role].Contains(name))
                 {
                     CrossLangRoleNames[role].Add(name);
@@ -454,7 +453,7 @@ public static class Translator
         {
             foreach (var lang in EnumHelper.GetAllValues<SupportedLangs>())
             {
-                var name = GetString($"{role}", lang).ToLower().Trim().Replace(" ", string.Empty);
+                var name = GetString($"{item}", lang).ToLower().Trim().Replace(" ", string.Empty);
                 if (!CrossLangRoleNames[item.Key].Contains(name))
                 {
                     CrossLangRoleNames[item.Key].Add(name);
