@@ -221,10 +221,8 @@ internal class Nemesis : RoleBase
 
     public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
     {
-        seen ??= seer;
-
         if (!seer.IsAlive() && seen.IsAlive())
-            return Utils.ColorString(Utils.GetRoleColor(CustomRoles.Nemesis), " " + seen.PlayerId.ToString()) + " ";
+            return CustomRoles.Nemesis.GetColoredTextByRole($" {seen.Data.PlayerId} ");
 
         return string.Empty;
     }
