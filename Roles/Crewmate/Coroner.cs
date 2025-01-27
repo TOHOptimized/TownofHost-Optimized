@@ -1,5 +1,6 @@
 ﻿using Hazel;
 using InnerNet;
+using System.Text;
 using TOHE.Modules;
 using TOHE.Roles.Core;
 using UnityEngine;
