@@ -3586,6 +3586,15 @@
     "AdmiredPlayer": "Player admired",
     "AdmirerInvalidTarget": "Target cannot be admired",
 
+    "TaskManager_OptionCanCompleteTaskAfterDeath": "Can Complete Random Tasks for Players After Death",
+    "TaskManager_OptionCanGetHelpfulAddons": "Can get <color=#8cffff>Helpful</color> Add-ons",
+    "TaskManager_OptionCanGetHarmfulAddons": "Can get <color=#ff1919>Harmful</color> Add-ons",
+    "TaskManager_OptionCanGetMixedAddons": "Can get <color=#32a87f>Mixed</color> Add-ons",
+    "TaskManager_OptionCanSeeAllCompletedTasks": "Can see all Completed Tasks",
+    "TaskManager_FailGetAddon": "Failed to get random Add-on and complete random tasks",
+    "TaskManager_YouGetAddon": "All players completed their tasks, so you get a random Add-on",
+    "TaskManager_CompletedRandomTaskForPlayer": "<color=#00ffa5>Task Manager</color> has completed your random task!",
+
     "SpiritualistNoticeTitle": "SPIRITUALIST ",
     "SpiritualistNoticeMessage": "The Spiritualist has an arrow pointing to you!\nYou can use them to a killer or frame a Crewmate",
     "SpiritualistShowGhostArrowForSeconds": "Ghost arrow duration",
