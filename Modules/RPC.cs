@@ -75,13 +75,13 @@ public enum CustomRPC : byte // 185/255 USED
     SniperSync,
     SetLoversPlayers,
     SendFireworkerState,
-    SetCurrentDousingTarget,
     SetEvilTrackerTarget,
     SyncRevolutionistData,
 
     // BetterAmongUs (BAU) RPC, This is sent to allow other BAU users know who's using BAU!
     BetterCheck = 150,
 
+    SetCurrentDousingTarget,
     SetDrawPlayer,
     SetCrewpostorTasksDone,
     RpcPassBomb,
@@ -405,6 +405,7 @@ internal class RPCHandlerPatch
                     Revolutionist.ReceiveDrawPlayerRPC(reader);
                 else
                     Revolutionist.ReceiveCountdown(reader);
+                break;
             case CustomRPC.SetOverseerRevealedPlayer:
                 Overseer.ReceiveSetRevealedPlayerRPC(reader);
                 break;
