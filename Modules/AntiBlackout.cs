@@ -297,7 +297,8 @@ public static class AntiBlackout
                 }
             }
 
-            if (!isDead && seerId == targetId && seer.HasImpKillButton()) continue;
+            if (!isDead && isSelf && seer.HasImpKillButton()) continue;
+            
             target.RpcSetRoleDesync(changedRoleType, seer.GetClientId());
         }
         ResetAllCooldown();
