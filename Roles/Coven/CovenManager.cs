@@ -165,9 +165,6 @@ public abstract class CovenManager : RoleBase // NO, THIS IS NOT A ROLE
 
     public static void NecronomiconCheck()
     {
-        if (necroHolder == byte.MaxValue) return;
-
-        var necroHolderPlayer = necroHolder.GetPlayer();
         if (necroHolder == byte.MaxValue || !GetPlayerById(necroHolder).IsAlive() || !GetPlayerById(necroHolder).IsPlayerCoven())
         {
             GiveNecronomicon();
