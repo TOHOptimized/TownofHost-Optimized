@@ -44,7 +44,7 @@ internal class Innocent : RoleBase
         return false;
     }
 
-    public override void CheckExileTarget(NetworkedPlayerInfo exiled, ref bool DecidedWinner, bool isMeetingHud, ref string name)
+     public override void CheckExileTarget(NetworkedPlayerInfo exiled, ref bool DecidedWinner, bool isMeetingHud, ref System.Text.StringBuilder name)
     {
         if (exiled == null || !TargetIsKilled) return;
 
@@ -62,8 +62,8 @@ internal class Innocent : RoleBase
         {
             if (isMeetingHud)
             {
-                if (DecidedWinner) name += string.Format(GetString("ExiledInnocentTargetAddBelow"));
-                else name = string.Format(GetString("ExiledInnocentTargetInOneLine"), Main.LastVotedPlayer, Utils.GetDisplayRoleAndSubName(exiled.PlayerId, exiled.PlayerId, true));
+                name.Append(string.Format(GetString("ExiledInnocentTargetAddBelow")));
+                else name.Clear().Append(string.Format(GetString("ExiledInnocentTargetInOneLine"), Main.LastVotedPlayer, Utils.GetDisplayRoleAndSubName(exiled.PlayerId, exiled.PlayerId, true)));
             }
             else
             {
