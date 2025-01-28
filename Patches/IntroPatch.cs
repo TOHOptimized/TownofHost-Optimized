@@ -563,6 +563,12 @@ class BeginCrewmatePatch
                         PlayerControl.LocalPlayer.Data.Role.IntroSound = ShipStatus.Instance.VentEnterSound;
                         break;
 
+                    case CustomRoles.Dictator:
+                    case CustomRoles.Mayor:
+                    case CustomRoles.Swapper:
+                        PlayerControl.LocalPlayer.Data.Role.IntroSound = DestroyableSingleton<HudManager>.Instance.Chat.messageSound;
+                        break;
+                        
                     case CustomRoles.Saboteur:
                     case CustomRoles.Inhibitor:
                     case CustomRoles.Mechanic:
