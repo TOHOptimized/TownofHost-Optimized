@@ -566,7 +566,7 @@ class BeginCrewmatePatch
                     case CustomRoles.Dictator:
                     case CustomRoles.Mayor:
                     case CustomRoles.Swapper:
-                        PlayerControl.LocalPlayer.Data.Role.IntroSound = DestroyableSingleton<HudManager>.Instance.Chat.messageSound;
+                        PlayerControl.LocalPlayer.Data.Role.IntroSound = DestroyableSingleton<HudManager>.Instance.Chat.warningSound;
                         break;
                         
                     case CustomRoles.Saboteur:
@@ -581,6 +581,12 @@ class BeginCrewmatePatch
                         PlayerControl.LocalPlayer.Data.Role.IntroSound = DestroyableSingleton<HnSImpostorScreamSfx>.Instance.HnSOtherImpostorTransformSfx;
                         break;
 
+                    case CustomRoles.Sheriff:
+                    case CustomRoles.ChiefOfPolice:
+                    case CustomRoles.Deputy:
+                        PlayerControl.LocalPlayer.Data.Role.IntroSound = DestroyableSingleton<HnSImpostorScreamSfx>.Instance.HnSOtherYeehawSfx;
+                        break;
+
                     case CustomRoles.GM:
                         __instance.TeamTitle.text = Utils.GetRoleName(role);
                         __instance.TeamTitle.color = Utils.GetRoleColor(role);
@@ -590,8 +596,6 @@ class BeginCrewmatePatch
                         __instance.ImpostorText.text = GetString("SubText.GM");
                         break;
 
-                    case CustomRoles.ChiefOfPolice:
-                    case CustomRoles.Sheriff:
                     case CustomRoles.Veteran:
                     case CustomRoles.Knight:
                     case CustomRoles.KillingMachine:
