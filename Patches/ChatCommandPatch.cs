@@ -1,9 +1,7 @@
-using AmongUs.GameOptions;
 using Assets.CoreScripts;
 using Hazel;
 using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using TOHE.Modules;
@@ -106,7 +104,7 @@ internal class ChatCommands
                     foreach (var kvp in Main.playerVersion.OrderBy(pair => pair.Key).ToArray())
                     {
                         var pc = Utils.GetClientById(kvp.Key)?.Character;
-                        version_text += $"{kvp.Key}/{(pc?.PlayerId != null ? pc.PlayerId.ToString() : "null")}:{pc?.GetRealName(clientData: true) ?? "null"}:{kvp.Value.forkId}/{kvp.Value.version}({kvp.Value.tag})\n";
+                        version_text.Clear().Append($"{kvp.Key}/{(pc?.PlayerId != null ? pc.PlayerId.ToString() : "null")}:{pc?.GetRealName(clientData: true) ?? "null"}:{kvp.Value.forkId}/{kvp.Value.version}({kvp.Value.tag})\n");
                     }
                     if (version_text != "")
                     {
@@ -118,7 +116,7 @@ internal class ChatCommands
                 catch (Exception e)
                 {
                     Logger.Error(e.Message, "/version");
-                    version_text = "Error while getting version : " + e.Message;
+                    version_text.Clear().Append("Error while getting version : " + e.Message);
                     if (version_text != "")
                     {
                         player.SetName(title);
@@ -2168,9 +2166,9 @@ internal class ChatCommands
             }
 
             GhostRoleAssign.forceRole.Remove(pid);
-            RoleAssign.SetRoles.Remove(pid);
-            RoleAssign.SetRoles.Add(pid, result);
-            Utils.SendMessage(string.Format(GetString("Message.YTPlanSelected"), Translator.GetActualRoleName(result), playerId));
+            RoleAssign.SetRoles[pid] = result;
+
+            Utils.SendMessage(string.Format(GetString("Message.YTPlanSelected"), Translator.GetActualRoleName(result)), playerId);
             return;
             }
         
@@ -2184,15 +2182,13 @@ internal class ChatCommands
                     _ => CustomRoles.CrewmateTOHO
 
                         };
-                RoleAssign.SetRoles.Remove(pid);
-                RoleAssign.SetRoles.Add(pid, setrole);
+                RoleAssign.SetRoles[pid] = setrole;
                 GhostRoleAssign.forceRole[pid] = result;
             }
             else
             {
                 GhostRoleAssign.forceRole.Remove(pid);
-                RoleAssign.SetRoles.Remove(pid);
-                RoleAssign.SetRoles.Add(pid, result);
+                RoleAssign.SetRoles[pid] = result;
             }
         }            
 
