@@ -55,7 +55,7 @@ internal class Doppelganger : RoleBase
         }
 
         if (killer == null || target == null || Camouflage.IsCamouflage || Camouflager.AbilityActivated || Utils.IsActive(SystemTypes.MushroomMixupSabotage)) return true;
-        if (Main.CheckShapeshift.TryGetValue(target.PlayerId, out bool isShapeshifitng) && isShapeshifitng)
+        if (Main.CheckShapeshift.GetValueOrDefault(target.PlayerId, false))
         {
             Logger.Info("Target was shapeshifting", "Doppelganger");
             return true;
