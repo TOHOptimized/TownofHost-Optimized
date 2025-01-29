@@ -1405,7 +1405,9 @@ class FixedUpdateInNormalGamePatch
                 }
                 else if (Main.BAUPlayers.TryGetValue(__instance.Data, out var puid)) // Set name color for BAU users
                 {
-                    moddedTag.Append($"<color=#0dff00>{__instance.name}</color>");
+                    if (puid == __instance.Data.Puid)
+                    {
+                        moddedTag.Append($"<color=#0dff00>{__instance.name}</color>");
                     }
                 }
                 else moddedTag.Append(__instance?.Data?.PlayerName);
