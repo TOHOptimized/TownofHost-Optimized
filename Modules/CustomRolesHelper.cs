@@ -227,6 +227,9 @@ public static class CustomRolesHelper
             CustomRoles.Assassin or
             CustomRoles.Vaporizer or
             CustomRoles.Artist or
+            CustomRoles.Slayer or
+            CustomRoles.Contaminator or
+            CustomRoles.Massacre or
             CustomRoles.Cultist;
     }
     public static bool IsTasklessCrewmate(this CustomRoles role)
@@ -681,6 +684,11 @@ public static class CustomRolesHelper
                     return false;
                 break;
 
+            case CustomRoles.FragileHunter:
+                if (!pc.CanUseKillButton())
+                    return false;
+                break;
+
             case CustomRoles.Underclocked:
                 if (!pc.CanUseKillButton())
                     return false;
@@ -733,6 +741,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Diviner)
                     || pc.Is(CustomRoles.Veteran)
                     || pc.Is(CustomRoles.Guardian)
+                    || pc.Is(CustomRoles.FragileHunter)
                     || pc.Is(CustomRoles.Medic)
                     || pc.Is(CustomRoles.Bomber)
                     || pc.Is(CustomRoles.Jinx)
@@ -1415,6 +1424,9 @@ public static class CustomRolesHelper
            CustomRoles.Solsticer => CountTypes.None,
            CustomRoles.Revenant => CountTypes.None,
            CustomRoles.Artist => CountTypes.Artist,
+           CustomRoles.Slayer => CountTypes.Slayer,
+           CustomRoles.Contaminator => CountTypes.Contaminator,
+           CustomRoles.Massacre => CountTypes.Massacre,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
 
            // CustomRoles.Phantom => CountTypes.OutOfGame,
@@ -1461,6 +1473,7 @@ public static class CustomRolesHelper
             CustomRoles.Pickpocket => CustomWinner.Pickpocket,
             CustomRoles.Traitor => CustomWinner.Traitor,
             CustomRoles.Vulture => CustomWinner.Vulture,
+            CustomRoles.FragileHunter => CustomWinner.FragileHunter,
             CustomRoles.Apocalypse => CustomWinner.Apocalypse,
             CustomRoles.Spiritcaller => CustomWinner.Spiritcaller,
             CustomRoles.Glitch => CustomWinner.Glitch,
@@ -1479,6 +1492,9 @@ public static class CustomRolesHelper
             CustomRoles.Keymaster => CustomWinner.Keymaster,
             CustomRoles.Narc => CustomWinner.Narc,
             CustomRoles.Artist => CustomWinner.Artist,
+            CustomRoles.Slayer => CustomWinner.Slayer,
+            CustomRoles.Contaminator => CustomWinner.Contaminator,
+            CustomRoles.Massacre => CustomWinner.Massacre,
             _ => throw new NotImplementedException()
 
         };
@@ -1517,6 +1533,9 @@ public static class CustomRolesHelper
             CountTypes.DarkFairy => CustomRoles.DarkFairy,
             CountTypes.Assassin => CustomRoles.Assassin,
             CountTypes.Vaporizer => CustomRoles.Vaporizer,
+            CountTypes.Slayer => CustomRoles.Slayer,
+            CountTypes.Contaminator => CustomRoles.Contaminator,
+            CountTypes.Massacre => CustomRoles.Massacre,
             _ => throw new NotImplementedException()
         };
     public static bool HasSubRole(this PlayerControl pc) => Main.PlayerStates[pc.PlayerId].SubRoles.Any();
@@ -1609,5 +1628,8 @@ public enum CountTypes
     Darkened,
     Assassin,
     Vaporizer,
-    Artist
+    Artist,
+    Slayer,
+    Contaminator,
+    Massacre
 }

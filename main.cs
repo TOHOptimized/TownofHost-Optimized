@@ -45,8 +45,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.Limeau.townofhostoptimized";
-    public const string PluginVersion = "2025.0125.140.01"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.4.0 Test 1";
+    public const string PluginVersion = "2025.0128.140.02"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.4.0 Test 2";
     public const string SupportedVersionAU = "2024.10.29"; // Changed becasue Dark theme works at this version.
 
     /******************* Change one of the three variables to true before making a release. *******************/
@@ -719,6 +719,7 @@ public enum CustomRoles
     Hangman,
     Inhibitor,
     Instigator,
+    Investor,
     Kamikaze,
     KillingMachine,
     Lightning,
@@ -736,6 +737,7 @@ public enum CustomRoles
     Puppeteer,
     QuickShooter,
     Refugee,
+    Rich,
     RiftMaker,
     Saboteur,
     Scavenger,
@@ -770,6 +772,7 @@ public enum CustomRoles
     Admirer,
     Alchemist,
     Altruist,
+    Astral,
     Bastion,
     Benefactor,
     Bodyguard,
@@ -815,6 +818,7 @@ public enum CustomRoles
     Oracle,
     Overseer,
     Pacifist,
+    Phantasm,
     President,
     Protector,
     Psychic,
@@ -853,6 +857,7 @@ public enum CustomRoles
     Berserker,
     BloodKnight,
     Collector,
+    Contaminator,
     Cultist,
     CursedSoul,
     DarkFairy,
@@ -877,6 +882,7 @@ public enum CustomRoles
     Laborer,
     Lawyer,
     Maverick,
+    Massacre,
     Narc,
     Opportunist,
     Pelican,
@@ -903,6 +909,7 @@ public enum CustomRoles
     Shocker,
     Shroud,
     Sidekick,
+    Slayer,
     Solsticer,
     SoulCollector,
     Specter,
@@ -983,6 +990,7 @@ public enum CustomRoles
     Flash,
     Fool,
     Fragile,
+    FragileHunter,
     Gambler,
     Ghoul,
     Glow,
@@ -1120,6 +1128,10 @@ public enum CustomWinner
     Keymaster = CustomRoles.Keymaster,
     Narc = CustomRoles.Narc,
     Artist = CustomRoles.Artist,
+    Slayer = CustomRoles.Slayer,
+    FragileHunter = CustomRoles.FragileHunter,
+    Contaminator = CustomRoles.Contaminator,
+    Massacre = CustomRoles.Massacre,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners
