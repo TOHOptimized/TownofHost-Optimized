@@ -95,7 +95,7 @@ internal class ChatCommands
             case "/versão":
             case "/版本":
                 canceled = true;
-                var version_text = new StringBuilder()
+                var version_text = new StringBuilder();
                 var player = PlayerControl.LocalPlayer;
                 var title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
                 var name = player?.Data?.PlayerName;
