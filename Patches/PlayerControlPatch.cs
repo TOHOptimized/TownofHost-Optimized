@@ -1527,7 +1527,7 @@ class FixedUpdateInNormalGamePatch
                         Suffix.Append(FFAManager.GetPlayerArrow(localPlayer, player));
                         break;
                     case CustomGameMode.CandR:
-                        Suffix.Append(CopsAndRobbersManager.GetClosestArrow(seer, target));
+                        Suffix.Append(CopsAndRobbersManager.GetClosestArrow(localPlayer, player));
                         break;
 
                     default:
