@@ -58,7 +58,7 @@ class DisableDevice
 
                 bool doComms = false;
                 Vector2 PlayerPos = pc.transform.position;
-                ool ignore = (DisableDevicesIgnoreImpostors.GetBool() && pc.Is(Custom_Team.Impostor)) ||
+                bool ignore = (DisableDevicesIgnoreImpostors.GetBool() && pc.Is(Custom_Team.Impostor)) ||
                         (DisableDevicesIgnoreNeutrals.GetBool() && pc.Is(Custom_Team.Neutral)) ||
                         (DisableDevicesIgnoreCrewmates.GetBool() && pc.Is(Custom_Team.Crewmate)) ||
                         (DisableDevicesIgnoreCoven.GetBool() && pc.Is(Custom_Team.Coven)) ||
