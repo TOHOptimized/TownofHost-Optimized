@@ -64,11 +64,11 @@ class CanUseVentPatch
             playerControl.IsAlive() &&
             (playerControl.CanMove || playerControl.inVent);
 
-        // Check vent cleaning
+        // Check Vent cleaning
         if (ShipStatus.Instance.Systems.TryGetValue(SystemTypes.Ventilation, out var systemType))
         {
-            VentilationSystem ventilationSystem = systemType.TryCast<VentilationSystem>();
-            // If someone is cleaning a vent, you can't get into that vent
+            VentilationSystem ventilationSystem = systemType.CastFast<VentilationSystem>();
+            // If someone is cleaning a Vent, you can't get into that Vent
             if (ventilationSystem != null && ventilationSystem.IsVentCurrentlyBeingCleaned(__instance.Id))
             {
                 couldUse = false;
