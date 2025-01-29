@@ -62,7 +62,7 @@ internal class Innocent : RoleBase
         {
             if (isMeetingHud)
             {
-                name.Append(string.Format(GetString("ExiledInnocentTargetAddBelow")));
+                if (DecidedWinner) name.Append(string.Format(GetString("ExiledInnocentTargetAddBelow")));
                 else name.Clear().Append(string.Format(GetString("ExiledInnocentTargetInOneLine"), Main.LastVotedPlayer, Utils.GetDisplayRoleAndSubName(exiled.PlayerId, exiled.PlayerId, true)));
             }
             else
