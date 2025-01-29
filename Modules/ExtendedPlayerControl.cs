@@ -26,8 +26,6 @@ static class ExtendedPlayerControl
         if (role < CustomRoles.NotAssigned)
         {
             Main.PlayerStates[player.PlayerId].SetMainRole(role);
-            //  player.GetRoleClass()?.OnAdd(player.PlayerId);
-            // Remember to manually add OnAdd if you are setting role mid game
             if (checkAddons && Options.RemoveIncompatibleAddOnsMidGame.GetBool()) player.RemoveIncompatibleAddOns();
         }
         else if (role >= CustomRoles.NotAssigned)   //500:NoSubRole 501~:SubRole 
@@ -508,9 +506,9 @@ static class ExtendedPlayerControl
     {
         if (player == null) return;
 
-        if (!player.HasImpKillButton(considerVanillaShift: true)) return;
-        if (player.HasImpKillButton(false) && !player.CanUseKillButton()) return;
-
+        if (!player.HasImpKillButton()) return;
+        if (player.HasImpKillButton() && !player.CanUseKillButton()) return;
+        
         if (AntiBlackout.SkipTasks)
         {
             Logger.Info($"player {player.PlayerId} should reset cooldown ({(time >= 0f ? time : Main.AllPlayerKillCooldown[player.PlayerId])}) while AntiBlackout", "SetKillCooldown");
@@ -1079,22 +1077,13 @@ static class ExtendedPlayerControl
 
             if (client != null)
             {
-                if (Main.AllClientRealNames.TryGetValue(client.Id, out var realname))
-                {
-                    return realname;
-                }
-                return player.GetClient().PlayerName;
+                return Main.AllClientRealNames.GetValueOrDefault(client.Id, player.GetClient().PlayerName);
             }
         }
 
         if (player.shapeshifting)
         {
-            if (Main.AllClientRealNames.TryGetValue(player.OwnerId, out var realname))
-            {
-                return realname;
-            }
-
-            return player.Data.DefaultOutfit.PlayerName;
+            return Main.AllClientRealNames.GetValueOrDefault(player.OwnerId, player.Data.DefaultOutfit.PlayerName);
         }
         return isMeeting || player == null ? player?.Data?.PlayerName : player?.name;
     }
@@ -1225,7 +1214,7 @@ static class ExtendedPlayerControl
                 break;
         }
 
-        if (!player.HasImpKillButton(considerVanillaShift: false))
+        if (!player.HasImpKillButton())
             Main.AllPlayerKillCooldown[player.PlayerId] = 300f;
 
         if (Main.AllPlayerKillCooldown[player.PlayerId] == 0)
@@ -1506,7 +1495,7 @@ static class ExtendedPlayerControl
     public static int GetPlayerVentId(this PlayerControl player)
     {
         if (!(ShipStatus.Instance.Systems.TryGetValue(SystemTypes.Ventilation, out var systemType) &&
-              systemType.TryCast<VentilationSystem>() is VentilationSystem ventilationSystem))
+              systemType.CastFast<VentilationSystem>() is VentilationSystem ventilationSystem))
             return 99;
 
         return ventilationSystem.PlayersInsideVents.TryGetValue(player.PlayerId, out var playerIdVentId) ? playerIdVentId : 99;
