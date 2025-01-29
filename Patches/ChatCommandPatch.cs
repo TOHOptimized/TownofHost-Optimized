@@ -95,7 +95,7 @@ internal class ChatCommands
             case "/versão":
             case "/版本":
                 canceled = true;
-                string version_text = "";
+                var version_text = new StringBuilder()
                 var player = PlayerControl.LocalPlayer;
                 var title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
                 var name = player?.Data?.PlayerName;
@@ -106,10 +106,10 @@ internal class ChatCommands
                         var pc = Utils.GetClientById(kvp.Key)?.Character;
                         version_text.Clear().Append($"{kvp.Key}/{(pc?.PlayerId != null ? pc.PlayerId.ToString() : "null")}:{pc?.GetRealName(clientData: true) ?? "null"}:{kvp.Value.forkId}/{kvp.Value.version}({kvp.Value.tag})\n");
                     }
-                    if (version_text != "")
+                    if (version_text.Length > 0)
                     {
                         player.SetName(title);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text);
+                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text.ToString(), false);
                         player.SetName(name);
                     }
                 }
@@ -117,10 +117,10 @@ internal class ChatCommands
                 {
                     Logger.Error(e.Message, "/version");
                     version_text.Clear().Append("Error while getting version : " + e.Message);
-                    if (version_text != "")
+                    if (version_text.Length > 0)
                     {
                         player.SetName(title);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text);
+                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text.ToString(), false);
                         player.SetName(name);
                     }
                 }
