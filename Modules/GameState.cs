@@ -50,7 +50,7 @@ public class PlayerState(byte playerId)
         {
             if (AmongUsClient.Instance.AmHost)
             {
-                if (!pc.HasImpKillButton(considerVanillaShift: true))
+                if (!pc.HasImpKillButton()) return;
                 {
                     var taskstate = pc.GetPlayerTaskState();
                     if (taskstate != null)
