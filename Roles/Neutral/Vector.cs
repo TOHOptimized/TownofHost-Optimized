@@ -70,7 +70,6 @@ internal class Vector : RoleBase
             }
         }
     }
-    
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Happy");
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
