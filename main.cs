@@ -50,7 +50,7 @@ public class Main : BasePlugin
     public const string SupportedVersionAU = "2024.10.29"; // Changed becasue Dark theme works at this version.
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: v2.2.0 Alpha 15
+    public static readonly bool devRelease = false; // Latest: v2.2.0 Alpha 16.1
     public static readonly bool canaryRelease = false; // Latest: v2.2.0 Beta 1
     public static readonly bool fullRelease = true; // Latest: v2.1.1
 
@@ -127,7 +127,7 @@ public class Main : BasePlugin
 
     public static BAUPlayersData BAUPlayers = new();
     public static Dictionary<int, PlayerVersion> playerVersion = [];
-    public static Dictionary<byte, PlayerState> PlayerStates = [];
+    public static readonly Dictionary<byte, PlayerState> PlayerStates = [];
     public static readonly Dictionary<byte, string> AllPlayerNames = [];
     public static readonly Dictionary<int, string> AllClientRealNames = [];
     public static readonly Dictionary<byte, CustomRoles> AllPlayerCustomRoles = [];
@@ -172,6 +172,7 @@ public class Main : BasePlugin
     public static readonly HashSet<byte> UnShapeShifter = [];
     public static readonly HashSet<byte> DeadPassedMeetingPlayers = [];
     public static readonly Dictionary<byte, bool> LowLoadUpdateName = [];
+    public static readonly Dictionary<byte, PlayerControl> CachedPlayerControl = [];
 
     public static bool GameIsLoaded { get; set; } = false;
 
