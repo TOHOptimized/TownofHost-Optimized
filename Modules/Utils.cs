@@ -1531,14 +1531,14 @@ public static class Utils
         }
         else
         {
-            var msg = new StringBuilder(Regex.Replace(txt, "^<voffset=[-]?\\d+em>", "")); // replaces the first instance of voffset, if any.
-                msg.Append($"<voffset=-1.3em><alpha=#00>.</voffset>"); // fix text clipping OOB
-                if (msg.ToString().IndexOf("\n") <= 4)
-                {
-                    var oldMsg = msg.ToString();
-                    msg.Clear().Append(oldMsg[(oldMsg.IndexOf("\n") + 1)..oldMsg.Length]);
-                }
-                SendMessage(msg.ToString(), sendTo, titleW);
+            var msg = new StringBuilder(text);
+            msg.Append("<voffset=-1.3em><alpha=#00>.</voffset>");
+            if (msg.ToString().IndexOf("\n") <= 4)
+            {
+                var oldtext = text.ToString();
+                msg.Clear().Append(oldtext[(oldtext.IndexOf("\n") + 1)..oldtext.Length]);
+            }
+            SendMessage(msg.ToString(), sendTo, title);
         }
 
 
@@ -1960,7 +1960,7 @@ public static class Utils
             RoleInfo = $"<size=50%>\n</size><size={GetInfoSize(player.GetRoleInfo())}%>{Font}{ColorString(player.GetRoleColor(), player.GetRoleInfo())}</font></size>";
         }
 
-        // Format addons
+        // Format Add-ons
         bool isFirstSub = true;
         foreach (var subRole in player.GetCustomSubRoles().ToArray())
         {
@@ -1976,7 +1976,7 @@ public static class Utils
 
         var SelfName = new StringBuilder($"{SelfTeamName}{SelfRoleName}{SelfSubRolesName}\r\n{RoleInfo}{RoleNameUp}");
 
-        // Privately sent name.
+        // Privately sent name
         player.RpcSetNamePrivate(SelfName.ToString(), player);
     }
 
@@ -2011,12 +2011,6 @@ public static class Utils
             if (Main.MeetingIsStarted && !isForMeeting) return;
         }
 
-        //var caller = new System.Diagnostics.StackFrame(1, false);
-        //var callerMethod = caller.GetMethod();
-        //string callerMethodName = callerMethod.Name;
-        //string callerClassName = callerMethod.DeclaringType.FullName;
-        //Logger.Info($" Was called from: {callerClassName}.{callerMethodName}", "NotifyRoles");
-
         await DoNotifyRoles(SpecifySeer, SpecifyTarget, isForMeeting, NoCache, ForceLoop, CamouflageIsForMeeting, MushroomMixupIsActive);
     }
     public static Task DoNotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false)
@@ -2032,8 +2026,6 @@ public static class Utils
             // When some one press report button but NotifyRoles is not for meeting
             if (Main.MeetingIsStarted && !isForMeeting) return Task.CompletedTask;
         }
-
-        //var logger = Logger.Handler("DoNotifyRoles");
 
         HudManagerPatch.NowCallNotifyRolesCount++;
         HudManagerPatch.LastSetNameDesyncCount = 0;
@@ -2053,8 +2045,6 @@ public static class Utils
 
         Logger.Info($" START - Count Seers: {seerList.Length} & Count Target: {targetList.Length}", "DoNotifyRoles");
 
-        //seer: player who updates the nickname/role/mark
-        //target: seer updates nickname/role/mark of other targets
         foreach (var seer in seerList)
         {
             // Do nothing when the seer is not present in the game
@@ -2070,8 +2060,6 @@ public static class Utils
                 ? seer.GetClient().PlatformData.Platform is Platforms.Playstation or Platforms.Xbox or Platforms.Switch ? "70%" : "1.6" 
                 : "1.8";
             
-            //logger.Info("NotifyRoles-Loop1-" + seer.GetNameWithRole() + ":START");
-
             var seerRole = seer.GetCustomRole();
             var seerRoleClass = seer.GetRoleClass();
 
@@ -2226,8 +2214,6 @@ public static class Utils
                     Main.LowLoadUpdateName[target.PlayerId] = true;
                     Main.LowLoadUpdateName[realTarget.PlayerId] = true;
 
-                    //logger.Info("NotifyRoles-Loop2-" + target.GetNameWithRole() + ":START");
-
                     // Hide player names in during Mushroom Mixup if seer is alive and desync impostor
                     if (!CamouflageIsForMeeting && MushroomMixupIsActive && target.IsAlive() && (!seer.Is(Custom_Team.Impostor) || Main.PlayerStates[seer.PlayerId].IsNecromancer) && seer.HasDesyncRole())
                     {
@@ -2272,6 +2258,7 @@ public static class Utils
                                     TargetSuffix.Insert(0, "\r\n");
                                 }
                                 break;
+                        }
 
                         // ====== Seer know target role ======
 
@@ -2287,8 +2274,8 @@ public static class Utils
                             var blankRT = new StringBuilder();
                             if (target.Is(CustomRoles.Trickster) || Illusionist.IsCovIllusioned(target.PlayerId))
                             {
-                                blankRT.Clear().Append(Overseer.GetRandomRole(seer.PlayerId)); // Random trickster role
-                                blankRT.Append(TaskState.GetTaskState()); // Random task count for revealed trickster
+                                blankRT.Clear().Append(Overseer.GetRandomRole(seer.PlayerId)); // Random Trickster role
+                                blankRT.Append(TaskState.GetTaskState()); // Random task count for revealed Trickster
                                 TargetRoleName.Clear().Append($"<size={fontSize}>{blankRT}</size>\r\n");
                             }
                             if (Illusionist.IsNonCovIllusioned(target.PlayerId))
@@ -2432,7 +2419,6 @@ public static class Utils
                 }
             }
         }
-        //Logger.Info($" Loop for Targets: {}", "DoNotifyRoles", force: true);
         Logger.Info($" END", "DoNotifyRoles");
         return Task.CompletedTask;
     }
@@ -2519,7 +2505,6 @@ public static class Utils
             PlayerState.DeathReason.Revenge => (CustomRoles.Avanger.IsEnable() || CustomRoles.Retributionist.IsEnable()
                                 || CustomRoles.Nemesis.IsEnable() || CustomRoles.Randomizer.IsEnable()),
             PlayerState.DeathReason.Quantization => (CustomRoles.Lightning.IsEnable()),
-            //PlayerState.DeathReason.Overtired => (CustomRoles.Workaholic.IsEnable()),
             PlayerState.DeathReason.Ashamed => (CustomRoles.Workaholic.IsEnable()),
             PlayerState.DeathReason.PissedOff => (CustomRoles.Pestilence.IsEnable() || CustomRoles.Provocateur.IsEnable()),
             PlayerState.DeathReason.Dismembered => (CustomRoles.Butcher.IsEnable()),
@@ -2601,7 +2586,7 @@ public static class Utils
             if (Statue.IsEnable) Statue.AfterMeetingTasks();
             if (Burst.IsEnable) Burst.AfterMeetingTasks();
 
-            if (CustomRoles.CopyCat.HasEnabled()) CopyCat.UnAfterMeetingTasks(); // All crew hast to be before this
+            if (CustomRoles.CopyCat.HasEnabled()) CopyCat.UnAfterMeetingTasks(); // All Crewmates has to be before this
             if (CustomRoles.Necromancer.HasEnabled()) Necromancer.UnAfterMeetingTasks();
         }
         catch (Exception error)
@@ -2663,11 +2648,6 @@ public static class Utils
     }
     public static string GetVoteName(byte num)
     {
-        //  HasNotVoted = 255;
-        //  MissedVote = 254;
-        //  SkippedVote = 253;
-        //  DeadVote = 252;
-
         string name = "invalid";
         var player = num.GetPlayer();
         var playerCount = Main.AllPlayerControls.Length;
@@ -2726,7 +2706,7 @@ public static class Utils
         {
             Logger.Error("playerState for {id} not found", "Utils.SummaryTexts");
             var notFoundText = new StringBuilder("[" + id + "]" + name + " : <b>ERROR</b>");
-            return notFoundText.ToString()
+            return notFoundText.ToString();
         }
 
         var TaskCount = new StringBuilder();
@@ -2765,7 +2745,7 @@ public static class Utils
         }
         return check && GetDisplayRoleAndSubName(id, id, true).RemoveHtmlTags().Contains("INVALID:NotAssigned")
             ? "INVALID"
-            disableColor ? summary.ToString().RemoveHtmlTags() : summary.ToString();
+            : disableColor ? summary.ToString().RemoveHtmlTags() : summary.ToString();
     }
     public static string RemoveHtmlTagsTemplate(this string str) => Regex.Replace(str, "", "");
     public static string RemoveHtmlTags(this string str) => Regex.Replace(str, "<[^>]*?>", "");
