@@ -20,14 +20,14 @@ public static class GuessManager
 {
     public static string GetFormatString()
     {
-        string text = GetString("PlayerIdList");
+        var text = new System.Text.StringBuilder(GetString("PlayerIdList"));
         foreach (var pc in Main.AllAlivePlayerControls)
         {
             string id = pc.PlayerId.ToString();
             string name = pc.GetRealName();
-            text += $"\n{id} → {name}";
+            text.Append($"\n{id} → {name}");
         }
-        return text;
+        return text.ToString();
     }
 
     public static bool CheckCommond(ref string msg, string command, bool exact = true)
@@ -436,7 +436,7 @@ public static class GuessManager
                         Main.PlayersDiedInMeeting.Add(dp.PlayerId);
                         MurderPlayerPatch.AfterPlayerDeathTasks(pc, dp, true);
 
-                        _ = new LateTask(() => { Utils.SendMessage(string.Format(GetString("GuessKill"), Name), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.NiceGuesser), GetString("GuessKillTitle")), true); }, 0.6f, "Guess Msg");
+                        _ = new LateTask(() => { Utils.SendMessage(string.Format(GetString("GuessKill"), Name), 255, CustomRoles.NiceGuesser.GetColoredTextByRole(GetString("GuessKillTitle")), true); }, 0.6f, "Guess Msg");
 
                         var doomsayers = Utils.GetPlayerListByRole(CustomRoles.Doomsayer);
                         if (Doomsayer.HasEnabled && doomsayers != null && doomsayers.Any()) doomsayers?.Select(x => x.GetRoleClass())
@@ -462,7 +462,7 @@ public static class GuessManager
             pc.RpcExileV2();
             Main.PlayerStates[pc.PlayerId].SetDead();
             var meetingHud = MeetingHud.Instance;
-            var hudManager = DestroyableSingleton<HudManager>.Instance;
+            var hudManager = FastDestroyableSingleton<HudManager>.Instance;
             SoundManager.Instance.PlaySound(pc.KillSfx, false, 0.8f);
             if (!Options.DisableKillAnimationOnGuess.GetBool()) hudManager.KillOverlay.ShowKillAnimation(pc.Data, pc.Data);
             if (amOwner)
@@ -517,7 +517,7 @@ public static class GuessManager
     {
         var amOwner = pc.AmOwner;
         var meetingHud = MeetingHud.Instance;
-        var hudManager = DestroyableSingleton<HudManager>.Instance;
+        var hudManager = FastDestroyableSingleton<HudManager>.Instance;
         SoundManager.Instance.PlaySound(pc.KillSfx, false, 0.8f);
         hudManager.KillOverlay.ShowKillAnimation(pc.Data, pc.Data);
         if (amOwner)
@@ -557,13 +557,13 @@ public static class GuessManager
 
         Regex r = new("\\d+");
         MatchCollection mc = r.Matches(msg);
-        string result = string.Empty;
+        var result = new System.Text.StringBuilder();
         for (int i = 0; i < mc.Count; i++)
         {
-            result += mc[i];
+            result.Append(mc[i]);
         }
 
-        if (int.TryParse(result, out int num))
+        if (int.TryParse(result.ToString(), out int num))
         {
             id = Convert.ToByte(num);
         }
@@ -605,31 +605,31 @@ public static class GuessManager
         {
             var roles = CustomRolesHelper.AllRoles.Where(x => x is not CustomRoles.NotAssigned).ToArray();
             var rd = IRandom.Instance;
-            string msg;
+            var msg = new System.Text.StringBuilder();
             string[] command = ["bet", "bt", "guess", "gs", "shoot", "st", "赌", "猜", "审判", "tl", "判", "审"];
             for (int i = 0; i < 20; i++)
             {
-               msg = "/";
+               msg.Clear().Append('/');
                 if (rd.Next(1, 100) < 20)
                 {
-                    msg += "id";
+                    msg.Append("id");
                 }
                 else
                 {
-                    msg += command[rd.Next(0, command.Length - 1)];
-                    msg += rd.Next(1, 100) < 50 ? string.Empty : " ";
-                    msg += rd.Next(0, 15).ToString();
-                    msg += rd.Next(1, 100) < 50 ? string.Empty : " ";
+                    msg.Append(command[rd.Next(0, command.Length - 1)]);
+                    msg.Append(rd.Next(1, 100) < 50 ? string.Empty : " ");
+                    msg.Append(rd.Next(0, 15));
+                    msg.Append(rd.Next(1, 100) < 50 ? string.Empty : " ");
                     CustomRoles role = roles.RandomElement();
-                    msg += rd.Next(1, 100) < 50 ? string.Empty : " ";
-                    msg += Utils.GetRoleName(role);
+                    msg.Append(rd.Next(1, 100) < 50 ? string.Empty : " ");
+                    msg.Append(Utils.GetRoleName(role));
                 }
                 var player = Main.AllAlivePlayerControls.RandomElement();
-                DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg);
+                FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg.ToString());
                 var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
                 writer.StartMessage(-1);
                 writer.StartRpc(player.NetId, (byte)RpcCalls.SendChat)
-                    .Write(msg)
+                    .Write(msg.ToString())
                     .EndRpc();
                 writer.EndMessage();
                 writer.SendMessage();

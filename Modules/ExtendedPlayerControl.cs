@@ -26,8 +26,6 @@ static class ExtendedPlayerControl
         if (role < CustomRoles.NotAssigned)
         {
             Main.PlayerStates[player.PlayerId].SetMainRole(role);
-            //  player.GetRoleClass()?.OnAdd(player.PlayerId);
-            // Remember to manually add OnAdd if you are setting role mid game
             if (checkAddons && Options.RemoveIncompatibleAddOnsMidGame.GetBool()) player.RemoveIncompatibleAddOns();
         }
         else if (role >= CustomRoles.NotAssigned)   //500:NoSubRole 501~:SubRole 
@@ -63,7 +61,7 @@ static class ExtendedPlayerControl
         roles.Shuffle();
         foreach (var addon in roles)
         {
-            if (!CustomRolesHelper.CheckAddonConfilct(addon, player) && player.ShouldBeRemoved(addon))
+            if (!CustomRolesHelper.CheckAddonConfilct(addon, player, checkLimitAddons: false, checkSelfAddOn: false))
             {
                 Main.PlayerStates[player.PlayerId].RemoveSubRole(addon);
                 Logger.Info($"{player.GetNameWithRole()} had incompatible addon {addon}, removing addon", $"{player.GetCustomRole()}");
@@ -452,26 +450,15 @@ static class ExtendedPlayerControl
     /// <summary>
     /// ONLY to be used when killer surely may kill the target, please check with killer.RpcCheckAndMurder(target, check: true) for indirect kill.
     /// </summary>
-    public static void RpcMurderPlayer(this PlayerControl killer, PlayerControl target, bool error = false)
+    public static void RpcMurderPlayer(this PlayerControl killer, PlayerControl target)
     {
-         if (!error)
+        // If Target is Dollmaster or Possessed Player run Dollmasters kill check instead.
+        if (DollMaster.SwapPlayerInfo(target) != target)
         {
-            // If Target is Dollmaster or Possessed Player run Dollmasters kill check instead.
-            if (DollMaster.SwapPlayerInfo(target) != target)
-            {
-                DollMaster.CheckMurderAsPossessed(killer, target);
-                return;
-            }
-
+            DollMaster.CheckMurderAsPossessed(killer, target);
+            return;
+        }
         killer.RpcMurderPlayer(target, true);
-        }
-        else
-        {
-            MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)RpcCalls.MurderPlayer, SendOption.Reliable, killer.OwnerId);
-            messageWriter.WriteNetObject(target);
-            messageWriter.Write((int)MurderResultFlags.FailedError);
-            AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
-        }
     }
     public static void RpcGuardAndKill(this PlayerControl killer, PlayerControl target = null, bool forObserver = false, bool forTechnician = false, bool fromSetKCD = false)
     {
@@ -519,9 +506,9 @@ static class ExtendedPlayerControl
     {
         if (player == null) return;
 
-        if (!player.HasImpKillButton(considerVanillaShift: true)) return;
-        if (player.HasImpKillButton(false) && !player.CanUseKillButton()) return;
-
+        if (!player.HasImpKillButton()) return;
+        if (player.HasImpKillButton() && !player.CanUseKillButton()) return;
+        
         if (AntiBlackout.SkipTasks)
         {
             Logger.Info($"player {player.PlayerId} should reset cooldown ({(time >= 0f ? time : Main.AllPlayerKillCooldown[player.PlayerId])}) while AntiBlackout", "SetKillCooldown");
@@ -1090,22 +1077,13 @@ static class ExtendedPlayerControl
 
             if (client != null)
             {
-                if (Main.AllClientRealNames.TryGetValue(client.Id, out var realname))
-                {
-                    return realname;
-                }
-                return player.GetClient().PlayerName;
+                return Main.AllClientRealNames.GetValueOrDefault(client.Id, player.GetClient().PlayerName);
             }
         }
 
         if (player.shapeshifting)
         {
-            if (Main.AllClientRealNames.TryGetValue(player.OwnerId, out var realname))
-            {
-                return realname;
-            }
-
-            return player.Data.DefaultOutfit.PlayerName;
+            return Main.AllClientRealNames.GetValueOrDefault(player.OwnerId, player.Data.DefaultOutfit.PlayerName);
         }
         return isMeeting || player == null ? player?.Data?.PlayerName : player?.name;
     }
@@ -1236,7 +1214,7 @@ static class ExtendedPlayerControl
                 break;
         }
 
-        if (!player.HasImpKillButton(considerVanillaShift: false))
+        if (!player.HasImpKillButton())
             Main.AllPlayerKillCooldown[player.PlayerId] = 300f;
 
         if (Main.AllPlayerKillCooldown[player.PlayerId] == 0)
@@ -1302,7 +1280,7 @@ static class ExtendedPlayerControl
         SetUpRoleTextPatch.IsInIntro = false;
         ReportDeadBodyPatch.AfterReportTasks(reporter, target, true);
         MeetingRoomManager.Instance.AssignSelf(reporter, target);
-        DestroyableSingleton<HudManager>.Instance.OpenMeetingRoom(reporter);
+        FastDestroyableSingleton<HudManager>.Instance.OpenMeetingRoom(reporter);
         
         _ = new LateTask(() =>
         {
@@ -1330,9 +1308,8 @@ static class ExtendedPlayerControl
     ///<returns>GetPlayersInAbilityRangeSortedの戻り値から条件に合わないプレイヤーを除外したもの。</returns>
     public static List<PlayerControl> GetPlayersInAbilityRangeSorted(this PlayerControl player, Predicate<PlayerControl> predicate, bool ignoreColliders = false)
     {
-        var rangePlayersIL = RoleBehaviour.GetTempPlayerList();
+        var rangePlayersIL = player.Data.Role.GetPlayersInAbilityRangeSorted(RoleBehaviour.GetTempPlayerList(), ignoreColliders);
         List<PlayerControl> rangePlayers = [];
-        player.Data.Role.GetPlayersInAbilityRangeSorted(rangePlayersIL, ignoreColliders);
         foreach (var pc in rangePlayersIL.GetFastEnumerator())
         {
             if (predicate(pc)) rangePlayers.Add(pc);
@@ -1370,7 +1347,7 @@ static class ExtendedPlayerControl
     public static bool KnowRoleTarget(PlayerControl seer, PlayerControl target)
     {
         if (Options.CurrentGameMode == CustomGameMode.FFA || GameEndCheckerForNormal.GameIsEnded) return true;
-        else if (seer.Is(CustomRoles.GM) || target.Is(CustomRoles.GM) || (PlayerControl.LocalPlayer.PlayerId == seer.PlayerId && Main.GodMode.Value)) return true;
+        else if (seer.Is(CustomRoles.GM) || target.Is(CustomRoles.GM) || (seer.AmOwner && Main.GodMode.Value)) return true;
         else if (Options.SeeEjectedRolesInMeeting.GetBool() && Main.PlayerStates[target.PlayerId].deathReason == PlayerState.DeathReason.Vote) return true;
         else if (Altruist.HasEnabled && seer.IsMurderedThisRound()) return false;
         else if (seer.GetCustomRole() == target.GetCustomRole() && seer.GetCustomRole().IsNK()) return true;
@@ -1518,7 +1495,7 @@ static class ExtendedPlayerControl
     public static int GetPlayerVentId(this PlayerControl player)
     {
         if (!(ShipStatus.Instance.Systems.TryGetValue(SystemTypes.Ventilation, out var systemType) &&
-              systemType.TryCast<VentilationSystem>() is VentilationSystem ventilationSystem))
+              systemType.CastFast<VentilationSystem>() is VentilationSystem ventilationSystem))
             return 99;
 
         return ventilationSystem.PlayersInsideVents.TryGetValue(player.PlayerId, out var playerIdVentId) ? playerIdVentId : 99;

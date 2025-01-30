@@ -1,6 +1,7 @@
 using Assets.CoreScripts;
 using Hazel;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -95,7 +96,7 @@ internal class ChatCommands
             case "/versão":
             case "/版本":
                 canceled = true;
-                string version_text = "";
+                var version_text = new StringBuilder();
                 var player = PlayerControl.LocalPlayer;
                 var title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
                 var name = player?.Data?.PlayerName;
@@ -104,23 +105,23 @@ internal class ChatCommands
                     foreach (var kvp in Main.playerVersion.OrderBy(pair => pair.Key).ToArray())
                     {
                         var pc = Utils.GetClientById(kvp.Key)?.Character;
-                        version_text += $"{kvp.Key}/{(pc?.PlayerId != null ? pc.PlayerId.ToString() : "null")}:{pc?.GetRealName(clientData: true) ?? "null"}:{kvp.Value.forkId}/{kvp.Value.version}({kvp.Value.tag})\n";
+                        version_text.Clear().Append($"{kvp.Key}/{(pc?.PlayerId != null ? pc.PlayerId.ToString() : "null")}:{pc?.GetRealName(clientData: true) ?? "null"}:{kvp.Value.forkId}/{kvp.Value.version}({kvp.Value.tag})\n");
                     }
-                    if (version_text != "")
+                    if (version_text.Length > 0)
                     {
                         player.SetName(title);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text);
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text.ToString(), false);
                         player.SetName(name);
                     }
                 }
                 catch (Exception e)
                 {
                     Logger.Error(e.Message, "/version");
-                    version_text = "Error while getting version : " + e.Message;
-                    if (version_text != "")
+                    version_text.Clear().Append("Error while getting version : " + e.Message);
+                    if (version_text.Length > 0)
                     {
                         player.SetName(title);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text);
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text.ToString(), false);
                         player.SetName(name);
                     }
                 }
@@ -221,7 +222,7 @@ internal class ChatCommands
                 case "/末日类中立职业介绍":
                 case "/末日类中立介绍":
                     canceled = true;
-                    Utils.SendMessage(GetString("Message.ApocalypseInfo"), PlayerControl.LocalPlayer.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Apocalypse), GetString("ApocalypseInfoTitle")));
+                    Utils.SendMessage(GetString("Message.ApocalypseInfo"), PlayerControl.LocalPlayer.PlayerId, CustomRoles.Apocalypse.GetColoredTextByRole(GetString("ApocalypseInfoTitle")));
                     break;
 
                 case "/coveninfo":
@@ -230,7 +231,7 @@ internal class ChatCommands
                 case "/巫师阵营介绍":
                 case "/巫师介绍":
                     canceled = true;
-                    Utils.SendMessage(GetString("Message.CovenInfo"), PlayerControl.LocalPlayer.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Coven), GetString("CovenInfoTitle")));
+                    Utils.SendMessage(GetString("Message.CovenInfo"), PlayerControl.LocalPlayer.PlayerId, CustomRoles.Coven.GetColoredTextByRole(GetString("CovenInfoTitle")));
                     break;
 
                 case "/rn":
@@ -339,7 +340,7 @@ internal class ChatCommands
 
                         default:
                             __instance.AddChat(PlayerControl.LocalPlayer, "crew | imp");
-                            if (TranslationController.Instance.currentLanguage.languageID == SupportedLangs.Brazilian)
+                            if (FastDestroyableSingleton<TranslationController>.Instance.currentLanguage.languageID == SupportedLangs.Brazilian)
                             {
                                 __instance.AddChat(PlayerControl.LocalPlayer, "tripulante | impostor");
                             }
@@ -636,7 +637,7 @@ internal class ChatCommands
 
                     if (string.IsNullOrEmpty(subArgs))
                     {
-                       HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser(), Devbox, UpBox, ColorBox)}");                   
+                       FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser(), Devbox, UpBox, ColorBox)}");
                     }
                     else
                     {
@@ -647,21 +648,21 @@ internal class ChatCommands
                                 var targetplayer = Utils.GetPlayerById(meid);
                                 if (targetplayer != null && targetplayer.GetClient() != null)
                                 {
-                                    HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandTargetInfo"), targetplayer.PlayerId, targetplayer.GetRealName(clientData: true), targetplayer.GetClient().FriendCode, targetplayer.GetClient().GetHashedPuid(), targetplayer.FriendCode.GetDevUser())}");                              
+                                    FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandTargetInfo"), targetplayer.PlayerId, targetplayer.GetRealName(clientData: true), targetplayer.GetClient().FriendCode, targetplayer.GetClient().GetHashedPuid(), targetplayer.FriendCode.GetDevUser())}");
                                 }
                                 else
                                 {
-                                    HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{(GetString("Message.MeCommandInvalidID"))}");
+                                    FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{(GetString("Message.MeCommandInvalidID"))}");
                                 }
                             }
                             else
                             {
-                                HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser(), Devbox, UpBox, ColorBox)}");
+                                FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser(), Devbox, UpBox, ColorBox)}");
                             }
                         }
                         else
                         {
-                            HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{(GetString("Message.MeCommandInvalidID"))}");
+                            FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{(GetString("Message.MeCommandInvalidID"))}");
                         }
                     }
                     break;
@@ -730,13 +731,13 @@ internal class ChatCommands
                 case "/玩家信息":
                 case "/玩家编号列表":
                     canceled = true;
-                    string msgText1 = GetString("PlayerIdList");
+                    var msgText1 = new StringBuilder(GetString("PlayerIdList"));
                     foreach (var pc in Main.AllPlayerControls)
                     {
                         if (pc == null) continue;
-                        msgText1 += "\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName();
+                        msgText1.Append("\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName());
                     }
-                    Utils.SendMessage(msgText1, PlayerControl.LocalPlayer.PlayerId);
+                    Utils.SendMessage(msgText1.ToString(), PlayerControl.LocalPlayer.PlayerId);
                     break;
 
                 case "/ban":
@@ -780,20 +781,16 @@ internal class ChatCommands
                     // Ban the specified player
                     AmongUsClient.Instance.KickPlayer(bannedPlayer.GetClientId(), true);
                     string bannedPlayerName = bannedPlayer.GetRealName();
-                    string textToSend1 = $"{bannedPlayerName} {GetString("BanCommandBanned")}{PlayerControl.LocalPlayer.name} \nReason: {banReason}\n";
+                    var textToSend1 = new StringBuilder($"{bannedPlayerName} {GetString("BanCommandBanned")}{PlayerControl.LocalPlayer.name} \nReason: {banReason}\n");
                     if (GameStates.IsInGame)
                     {
-                        textToSend1 += $" {GetString("BanCommandBannedRole")} {GetString(bannedPlayer.GetCustomRole().ToString())}";
+                        textToSend1.Append($" {GetString("BanCommandBannedRole")} {GetString(bannedPlayer.GetCustomRole().ToString())}");
                     }
-                    Utils.SendMessage(textToSend1);
-                    //string moderatorName = PlayerControl.LocalPlayer.GetRealName().ToString();
-                    //int startIndex = moderatorName.IndexOf("♥</color>") + "♥</color>".Length;
-                    //moderatorName = moderatorName.Substring(startIndex);
-                    //string extractedString = 
+                    Utils.SendMessage(textToSend1.ToString());
                     string moderatorFriendCode = PlayerControl.LocalPlayer.FriendCode.ToString();
                     string bannedPlayerFriendCode = bannedPlayer.FriendCode.ToString();
-                    string modLogname = Main.AllPlayerNames.TryGetValue(PlayerControl.LocalPlayer.PlayerId, out var n1) ? n1 : "";
-                    string banlogname = Main.AllPlayerNames.TryGetValue(bannedPlayer.PlayerId, out var n11) ? n11 : "";
+                    string modLogname = Main.AllPlayerNames.GetValueOrDefault(PlayerControl.LocalPlayer.PlayerId, string.Empty);
+                    string banlogname = Main.AllPlayerNames.GetValueOrDefault(bannedPlayer.PlayerId, string.Empty);
                     string logMessage = $"[{DateTime.Now}] {moderatorFriendCode},{modLogname} Banned: {bannedPlayerFriendCode},{banlogname} Reason: {banReason}";
                     File.AppendAllText(modLogFiles, logMessage + Environment.NewLine);
                     break;
@@ -829,7 +826,6 @@ internal class ChatCommands
                     string textToSend2 = "";
                     string warnReason = "Reason : Not specified\n";
                     string warnedPlayerName = warnedPlayer.GetRealName();
-                    //textToSend2 = $" {warnedPlayerName} {GetString("WarnCommandWarned")} ~{player.name}";
                     if (args.Length > 2)
                     {
                         warnReason = "Reason : " + string.Join(" ", args.Skip(2)) + "\n";
@@ -840,12 +836,9 @@ internal class ChatCommands
                     }
                     textToSend2 = $" {warnedPlayerName} {GetString("WarnCommandWarned")} {warnReason} ~{PlayerControl.LocalPlayer.name}";
                     Utils.SendMessage(textToSend2);
-                    //string moderatorName1 = PlayerControl.LocalPlayer.GetRealName().ToString();
-                    //int startIndex1 = moderatorName1.IndexOf("♥</color>") + "♥</color>".Length;
-                    //moderatorName1 = moderatorName1.Substring(startIndex1);
-                    string modLogname1 = Main.AllPlayerNames.TryGetValue(PlayerControl.LocalPlayer.PlayerId, out var n2) ? n2 : "";
-                    string warnlogname = Main.AllPlayerNames.TryGetValue(warnedPlayer.PlayerId, out var n12) ? n12 : "";
-
+                    string modLogname1 = Main.AllPlayerNames.GetValueOrDefault(PlayerControl.LocalPlayer.PlayerId, string.Empty);
+                    string warnlogname = Main.AllPlayerNames.GetValueOrDefault(warnedPlayer.PlayerId, string.Empty);
+                    
                     string moderatorFriendCode1 = PlayerControl.LocalPlayer.FriendCode.ToString();
                     string warnedPlayerFriendCode = warnedPlayer.FriendCode.ToString();
                     string warnedPlayerHashPuid = warnedPlayer.GetClient().GetHashedPuid();
@@ -892,19 +885,16 @@ internal class ChatCommands
                     {
                         Utils.SendMessage("Use /kick [id] [reason] in future. \nExample :-\n /kick 5 not following rules", PlayerControl.LocalPlayer.PlayerId);
                     }
-                    string textToSend = $"{kickedPlayerName} {GetString("KickCommandKicked")} {PlayerControl.LocalPlayer.name} \n {kickReason}";
+                    var textToSend = new StringBuilder($"{kickedPlayerName} {GetString("KickCommandKicked")} {PlayerControl.LocalPlayer.name} \n {kickReason}");
 
                     if (GameStates.IsInGame)
                     {
-                        textToSend += $" {GetString("KickCommandKickedRole")} {GetString(kickedPlayer.GetCustomRole().ToString())}";
+                        textToSend.Append($" {GetString("KickCommandKickedRole")} {GetString(kickedPlayer.GetCustomRole().ToString())}");
                     }
-                    Utils.SendMessage(textToSend);
-                    //string moderatorName2 = PlayerControl.LocalPlayer.GetRealName().ToString();
-                    //int startIndex2 = moderatorName2.IndexOf("♥</color>") + "♥</color>".Length;
-                    //moderatorName2 = moderatorName2.Substring(startIndex2);
-
-                    string modLogname2 = Main.AllPlayerNames.TryGetValue(PlayerControl.LocalPlayer.PlayerId, out var n3) ? n3 : "";
-                    string kicklogname = Main.AllPlayerNames.TryGetValue(kickedPlayer.PlayerId, out var n13) ? n13 : "";
+                    Utils.SendMessage(textToSend.ToString());
+                    
+                    string modLogname2 = Main.AllPlayerNames.GetValueOrDefault(PlayerControl.LocalPlayer.PlayerId, string.Empty);
+                    string kicklogname = Main.AllPlayerNames.GetValueOrDefault(kickedPlayer.PlayerId, string.Empty);
 
                     string moderatorFriendCode2 = PlayerControl.LocalPlayer.FriendCode.ToString();
                     string kickedPlayerFriendCode = kickedPlayer.FriendCode.ToString();
@@ -919,8 +909,8 @@ internal class ChatCommands
                 case "/标签颜色":
                 case "/附加名称颜色":
                     canceled = true;
-                    string name = Main.AllPlayerNames.TryGetValue(PlayerControl.LocalPlayer.PlayerId, out var n) ? n : "";
-                    if (name == "") break;
+                    string name = Main.AllPlayerNames.GetValueOrDefault(PlayerControl.LocalPlayer.PlayerId, string.Empty);
+                    if (name == string.Empty) break;
                     if (!name.Contains('\r') && PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag())
                     {
                         if (!GameStates.IsLobby)
@@ -1061,22 +1051,14 @@ internal class ChatCommands
                 case "/编号":
                 case "/玩家编号":
                     canceled = true;
-                    string msgText = GetString("PlayerIdList");
+                    var msgText = new StringBuilder(GetString("PlayerIdList"));
                     foreach (var pc in Main.AllPlayerControls)
                     {
                         if (pc == null) continue;
-                        msgText += "\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName();
+                        msgText.Append("\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName());
                     }
-                    Utils.SendMessage(msgText, PlayerControl.LocalPlayer.PlayerId);
+                    Utils.SendMessage(msgText.ToString(), PlayerControl.LocalPlayer.PlayerId);
                     break;
-
-                /*
-                case "/qq":
-                    canceled = true;
-                    if (Main.newLobby) Cloud.ShareLobby(true);
-                    else Utils.SendMessage("很抱歉，每个房间车队姬只会发一次", PlayerControl.LocalPlayer.PlayerId);
-                    break;
-                */
 
                 case "/setrole":
                 case "/设置的职业":
@@ -1239,25 +1221,25 @@ internal class ChatCommands
                         int basenum = Pollvotes.Values.Max();
                         var winners = Pollvotes.Where(x => x.Value == basenum);
 
-                        string msg = "";
+                        var msg = new StringBuilder();
 
-                        Color32 clr = new(47, 234, 45, 255); //Main.PlayerColors.First(x => x.Key == PlayerControl.LocalPlayer.PlayerId).Value;
+                        Color32 clr = new(47, 234, 45, 255);
                         var tytul = Utils.ColorString(clr, GetString("PollResultTitle"));
 
                         if (winners.Count() == 1)
                         {
                             var losers = Pollvotes.Where(x => x.Key != winners.First().Key);
-                            msg = string.Format(GetString("Poll.Result"), $"{winners.First().Key}{PollQuestions[winners.First().Key]}", winners.First().Value);
+                            msg.Append(string.Format(GetString("Poll.Result"), $"{winners.First().Key}{PollQuestions[winners.First().Key]}", winners.First().Value));
 
                             for (int i = 0; i < losers.Count(); i++)
                             {
-                                msg += $"\n{losers.ElementAt(i).Key} / {losers.ElementAt(i).Value} {PollQuestions[losers.ElementAt(i).Key]}";
+                                msg.Append($"\n{losers.ElementAt(i).Key} / {losers.ElementAt(i).Value} {PollQuestions[losers.ElementAt(i).Key]}");
 
                             }
-                            msg += "</size>";
+                            msg.Append("</size>");
 
 
-                            Utils.SendMessage(msg, title: tytul);
+                            Utils.SendMessage(msg.ToString(), title: tytul);
                         }
                         else
                         {
@@ -1266,9 +1248,9 @@ internal class ChatCommands
 
                             for (int i = 0; i < (tied.Count() - 1); i++)
                             {
-                                msg += "\n" + tied.ElementAt(i).Key + PollQuestions[tied.ElementAt(i).Key] + " & ";
+                                msg.Append("\n" + tied.ElementAt(i).Key + PollQuestions[tied.ElementAt(i).Key] + " & ");
                             }
-                            msg += "\n" + tied.Last().Key + PollQuestions[tied.Last().Key];
+                            msg.Append("\n" + tied.Last().Key + PollQuestions[tied.Last().Key]);
 
                             Utils.SendMessage(string.Format(GetString("Poll.Tied"), msg, tienum), title: tytul);
                         }
@@ -1307,23 +1289,23 @@ internal class ChatCommands
                     ClearTIT.RemoveRange(0, resultat.ToArray().Length);
 
                     var Questions = ClearTIT.ToArray();
-                    string msg = "";
+                    var msg = new StringBuilder();
 
 
-                    if (Longtitle) msg += "<voffset=-0.5em>" + tytul + "</voffset>\n\n";
+                    if (Longtitle) msg.Append("<voffset=-0.5em>" + tytul + "</voffset>\n\n");
                     for (int i = 0; i < Math.Clamp(Questions.Length, 2, 5); i++)
                     {
-                        msg += Utils.ColorString(RndCLR(), $"{char.ToUpper((char)(i + 65))}) {Questions[i]}\n");
+                        msg.Append(Utils.ColorString(RndCLR(), $"{char.ToUpper((char)(i + 65))}) {Questions[i]}\n"));
                         Pollvotes[char.ToUpper((char)(i + 65))] = 0;
                         PollQuestions[char.ToUpper((char)(i + 65))] = $"<size=45%>〖 {Questions[i]} 〗</size>";
                     }
-                    msg += $"\n{GetString("Poll.Begin")}";
-                    msg += $"\n<size=55%><i>{GetString("Poll.TimeInfo")}</i></size>";
-                    PollMSG = !Longtitle ? "<voffset=-0.5em>" + tytul + "</voffset>\n\n" + msg : msg;
+                    msg.Append($"\n{GetString("Poll.Begin")}");
+                    msg.Append($"\n<size=55%><i>{GetString("Poll.TimeInfo")}</i></size>");
+                    PollMSG = !Longtitle ? "<voffset=-0.5em>" + tytul + "</voffset>\n\n" + msg : msg.ToString();
 
                     Logger.Info($"Poll message: {msg}", "MEssapoll");
 
-                    Utils.SendMessage(msg, title: !Longtitle ? tytul : altTitle);
+                    Utils.SendMessage(msg.ToString(), title: !Longtitle ? tytul : altTitle);
 
                     Main.Instance.StartCoroutine(StartPollCountdown());
 
@@ -1566,7 +1548,7 @@ internal class ChatCommands
                             str = GetString("8BallWithDoubt");
                             break;
                     }
-                    Utils.SendMessage("<align=\"center\"><size=150%>" + str + "</align></size>", PlayerControl.LocalPlayer.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Medium), GetString("8BallTitle")));
+                    Utils.SendMessage("<align=\"center\"><size=150%>" + str + "</align></size>", PlayerControl.LocalPlayer.PlayerId, CustomRoles.Medium.GetColoredTextByRole(GetString("8BallTitle")));
                     break;
                 case "/start":
                 case "/开始":
@@ -2002,7 +1984,7 @@ internal class ChatCommands
 
         if (name == "" || name == string.Empty) return false;
 
-        if ((TranslationController.InstanceExists ? TranslationController.Instance.currentLanguage.languageID : SupportedLangs.SChinese) == SupportedLangs.SChinese)
+        if ((FastDestroyableSingleton<TranslationController>.Instance ? FastDestroyableSingleton<TranslationController>.Instance.currentLanguage.languageID : SupportedLangs.SChinese) == SupportedLangs.SChinese)
         {
             Regex r = new("[\u4e00-\u9fa5]+$");
             MatchCollection mc = r.Matches(name);
@@ -2010,21 +1992,43 @@ internal class ChatCommands
             for (int i = 0; i < mc.Count; i++)
             {
                 if (mc[i].ToString() == "是") continue;
-                result += mc[i]; //匹配结果是完整的数字，此处可以不做拼接的
+                result += mc[i];
             }
             name = FixRoleNameInput(result.Replace("是", string.Empty).Trim());
         }
         else name = name.Trim().ToLower();
 
-        foreach (var rl in CustomRolesHelper.AllRoles)
+        string nameWithoutId = Regex.Replace(name.Replace(" ", ""), @"^\d+", "");
+
+        if (Options.CrossLanguageGetRole.GetBool())
         {
-            if (rl.IsVanilla()) continue;
-            var roleName = GetString(rl.ToString()).ToLower().Trim().Replace(" ", "");
-            string nameWithoutId = Regex.Replace(name.Replace(" ", ""), @"^\d+", "");
-            if (nameWithoutId == roleName)
+            foreach (var rl in CustomRolesHelper.AllRoles)
             {
-                role = rl;
-                return true;
+                if (!CrossLangRoleNames.ContainsKey(rl))
+                    continue;
+                else
+                {
+                    if (!CrossLangRoleNames[rl].Contains(nameWithoutId))
+                        continue;
+                    else
+                    {
+                        role = rl;
+                        return true;
+                    }
+                }
+            }
+        }
+        else
+        {
+            foreach (var rl in CustomRolesHelper.AllRoles)
+            {
+                if (rl.IsVanilla()) continue;
+                var roleName = GetString(rl.ToString()).ToLower().Trim().Replace(" ", "");
+                if (nameWithoutId == roleName)
+                {
+                    role = rl;
+                    return true;
+                }
             }
         }
         return false;
@@ -2089,72 +2093,104 @@ internal class ChatCommands
         }
 
         role = FixRoleNameInput(role).ToLower().Trim().Replace(" ", string.Empty);
+        var result = CustomRoles.NotAssigned;
 
         foreach (var rl in CustomRolesHelper.AllRoles)
         {
             if (rl.IsVanilla()) continue;
-            var roleName = GetString(rl.ToString());
-            if (role == roleName.ToLower().Trim().TrimStart('*').Replace(" ", string.Empty))
+            if (Options.CrossLanguageGetRole.GetBool())
             {
-                string devMark = "";
-                if ((isDev || isUp) && GameStates.IsLobby)
+                if (!CrossLangRoleNames.ContainsKey(rl))
+                    continue;
+                else
                 {
-                    devMark = "▲";
-                    if (CustomRolesHelper.IsAdditionRole(rl) || rl is CustomRoles.GM or CustomRoles.Mini || rl.IsGhostRole()) devMark = "";
-                    if (rl.GetCount() < 1 || rl.GetMode() == 0) devMark = "";
-                    if (isUp)
+                    if (!CrossLangRoleNames[rl].Contains(role))
+                        continue;
+                    else
                     {
-                        if (devMark == "▲") Utils.SendMessage(string.Format(GetString("Message.YTPlanSelected"), roleName), playerId);
-                        else Utils.SendMessage(string.Format(GetString("Message.YTPlanSelectFailed"), roleName), playerId);
+                        result = rl;
+                        break;
                     }
-                    if (devMark == "▲")
-                    {
-                        byte pid = playerId == 255 ? (byte)0 : playerId;
-                        GhostRoleAssign.forceRole.Remove(pid);
-                        RoleAssign.SetRoles.Remove(pid);
-                        RoleAssign.SetRoles.Add(pid, rl);
-                    }
-                    if (rl.IsGhostRole() && !rl.IsAdditionRole() && isDev && (rl.GetCount() >= 1 && rl.GetMode() > 0))
-                    {
-                        byte pid = playerId == 255 ? (byte)0 : playerId;
-                        CustomRoles setrole = rl.GetCustomRoleTeam() switch
-                        {
-                            Custom_Team.Impostor => CustomRoles.ImpostorTOHO,
-                            _ => CustomRoles.CrewmateTOHO
-
-                        };
-                        RoleAssign.SetRoles.Remove(pid);
-                        RoleAssign.SetRoles.Add(pid, setrole);
-                        GhostRoleAssign.forceRole[pid] = rl;
-
-                        devMark = "▲";
-                    }
-
-                    if (isUp) return;
                 }
-                var Des = rl.GetInfoLong();
-                var title = devMark + $"<color=#ffffff>" + rl.GetRoleTitle() + "</color>\n";
-                var Conf = new StringBuilder();
-                string rlHex = Utils.GetRoleColorCode(rl);
-                if (Options.CustomRoleSpawnChances.TryGetValue(rl, out var spawnRate))
+            }
+            else
+            {
+                var roleName = GetString(rl.ToString());
+                if (role == roleName.ToLower().Trim().TrimStart('*').Replace(" ", string.Empty))
                 {
-                    Utils.ShowChildrenSettings(spawnRate, ref Conf);
-                    var cleared = Conf.ToString();
-                    var Setting = $"<color={rlHex}>{GetString(rl.ToString())} {GetString("Settings:")}</color>\n";
-                    Conf.Clear().Append($"<color=#ffffff>" + $"<size={Csize}>" + Setting + cleared + "</size>" + "</color>");
-
+                    result = rl;
+                    break;
                 }
-                // Show role info
-                Utils.SendMessage(Des, playerId, title, noReplay: true);
-
-                // Show role settings
-                Utils.SendMessage("", playerId, Conf.ToString(), noReplay: true);
-                return;
             }
         }
-        if (isUp) Utils.SendMessage(GetString("Message.YTPlanCanNotFindRoleThePlayerEnter"), playerId);
-        else Utils.SendMessage(GetString("Message.CanNotFindRoleThePlayerEnter"), playerId);
-        return;
+
+        if (result == CustomRoles.NotAssigned)
+        {
+            Utils.SendMessage(GetString("Message.CanNotFindRoleThePlayerEnter"), playerId);
+            return;
+        }
+
+        bool shouldDevAssign = isDev || isUp;
+
+        if (CustomRolesHelper.IsAdditionRole(result) || result is CustomRoles.GM or CustomRoles.Mini || result.IsGhostRole() && !isDev
+            || result.GetCount() < 1 || result.GetMode() == 0)
+        {
+            shouldDevAssign = false;
+        }
+
+        byte pid = playerId == 255 ? (byte)0 : playerId;
+        
+        if (isUp)
+        {
+            if (result.IsGhostRole() || !shouldDevAssign)
+            {
+                Utils.SendMessage(string.Format(GetString("Message.YTPlanSelectFailed"), Translator.GetActualRoleName(result)), playerId);
+            }
+
+            GhostRoleAssign.forceRole.Remove(pid);
+            RoleAssign.SetRoles[pid] = result;
+
+            Utils.SendMessage(string.Format(GetString("Message.YTPlanSelected"), Translator.GetActualRoleName(result)), playerId);
+            return;
+            }
+        
+           if (isDev && shouldDevAssign)
+        {
+            if (result.IsGhostRole() && !result.IsAdditionRole())
+            {
+                CustomRoles setrole = result.GetCustomRoleTeam() switch
+                {
+                    Custom_Team.Impostor => CustomRoles.ImpostorTOHO,
+                    _ => CustomRoles.CrewmateTOHO
+
+                        };
+                RoleAssign.SetRoles[pid] = setrole;
+                GhostRoleAssign.forceRole[pid] = result;
+            }
+            else
+            {
+                GhostRoleAssign.forceRole.Remove(pid);
+                RoleAssign.SetRoles[pid] = result;
+            }
+        }            
+
+        var Des = result.GetInfoLong();
+        var title = $"▲<color=#ffffff>{result.GetRoleTitle()}</color>\n";
+        var Conf = new StringBuilder();
+        string rlHex = Utils.GetRoleColorCode(result);
+        if (Options.CustomRoleSpawnChances.TryGetValue(result, out var spawnChances))
+        {
+            Utils.ShowChildrenSettings(spawnChances, ref Conf);
+            var cleared = Conf.ToString();
+            var Setting = $"<color={rlHex}>{GetString(result.ToString())} {GetString("Settings:")}</color>\n";
+            Conf.Clear().Append($"<color=#ffffff><size={Csize}>{Setting}{cleared}</size></color>");
+            
+        }
+        // Show role info
+        Utils.SendMessage(Des, playerId, title, noReplay: true);
+
+        // Show role settings
+        Utils.SendMessage("", playerId, Conf.ToString(), noReplay: true);
     }
     public static void OnReceiveChat(PlayerControl player, string text, out bool canceled)
     {
@@ -2341,12 +2377,15 @@ internal class ChatCommands
             case "/末日中立介绍":
             case "/末日类中立职业介绍":
             case "/末日类中立介绍":
-                Utils.SendMessage(GetString("Message.ApocalypseInfo"), player.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Apocalypse), GetString("ApocalypseInfoTitle")));
+                Utils.SendMessage(GetString("Message.ApocalypseInfo"), player.PlayerId, CustomRoles.Apocalypse.GetColoredTextByRole(GetString("ApocalypseInfoTitle")));
                 break;
 
             case "/coveninfo":
             case "/covinfo":
-                Utils.SendMessage(GetString("Message.CovenInfo"), player.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Coven), GetString("CovenInfoTitle")));
+            case "/巫师阵营职业介绍":
+            case "/巫师阵营介绍":
+            case "/巫师介绍":
+                Utils.SendMessage(GetString("Message.CovenInfo"), player.PlayerId, CustomRoles.Coven.GetColoredTextByRole(GetString("CovenInfoTitle")));
                 break;
 
             case "/rn":
@@ -2631,20 +2670,19 @@ internal class ChatCommands
                 if ((Options.ApplyModeratorList.GetValue() == 0 || (!Utils.IsPlayerModerator(player.FriendCode) && TagManager.ReadPermission(player.FriendCode) < 2))
                     && !Options.EnableVoteCommand.GetBool()) break;
 
-                string msgText = GetString("PlayerIdList");
+                var msgText = new StringBuilder(GetString("PlayerIdList"));
                 foreach (var pc in Main.AllPlayerControls)
                 {
                     if (pc == null) continue;
-                    msgText += "\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName();
+                    msgText.Append("\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName());
                 }
-                Utils.SendMessage(msgText, player.PlayerId);
+                Utils.SendMessage(msgText.ToString(), player.PlayerId);
                 break;
 
             case "/mid":
             case "/玩家列表":
             case "/玩家信息":
             case "/玩家编号列表":
-                //canceled = true;
                 //checking if modlist on or not
                 if (Options.ApplyModeratorList.GetValue() == 0)
                 {
@@ -2657,13 +2695,13 @@ internal class ChatCommands
                     Utils.SendMessage(GetString("midCommandNoAccess"), player.PlayerId);
                     break;
                 }
-                string msgText1 = GetString("PlayerIdList");
+                var msgText1 = new StringBuilder(GetString("PlayerIdList"));
                 foreach (var pc in Main.AllPlayerControls)
                 {
                     if (pc == null) continue;
-                    msgText1 += "\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName();
+                    msgText1.Append("\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName());
                 }
-                Utils.SendMessage(msgText1, player.PlayerId);
+                Utils.SendMessage(msgText1.ToString(), player.PlayerId);
                 break;
 
             case "/ban":
@@ -2671,7 +2709,6 @@ internal class ChatCommands
             case "/бан":
             case "/забанить":
             case "/封禁":
-                //canceled = true;
                 // Check if the ban command is enabled in the settings
                 if (Options.ApplyModeratorList.GetValue() == 0)
                 {
@@ -2696,7 +2733,6 @@ internal class ChatCommands
                     subArgs = args[1];
                     banReason = string.Join(" ", args.Skip(2));
                 }
-                //subArgs = args.Length < 2 ? "" : args[1];
                 if (string.IsNullOrEmpty(subArgs) || !byte.TryParse(subArgs, out byte banPlayerId))
                 {
                     Utils.SendMessage(GetString("BanCommandInvalidID"), player.PlayerId);
@@ -2726,18 +2762,14 @@ internal class ChatCommands
                 // Ban the specified player
                 AmongUsClient.Instance.KickPlayer(bannedPlayer.GetClientId(), true);
                 string bannedPlayerName = bannedPlayer.GetRealName();
-                string textToSend1 = $"{bannedPlayerName} {GetString("BanCommandBanned")}{player.name} \nReason: {banReason}\n";
+                var textToSend1 = new StringBuilder($"{bannedPlayerName} {GetString("BanCommandBanned")}{player.name} \nReason: {banReason}\n");
                 if (GameStates.IsInGame)
                 {
-                    textToSend1 += $" {GetString("BanCommandBannedRole")} {GetString(bannedPlayer.GetCustomRole().ToString())}";
+                    textToSend1.Append($" {GetString("BanCommandBannedRole")} {GetString(bannedPlayer.GetCustomRole().ToString())}");
                 }
-                Utils.SendMessage(textToSend1);
-                //string moderatorName = player.GetRealName().ToString();
-                //int startIndex = moderatorName.IndexOf("♥</color>") + "♥</color>".Length;
-                //moderatorName = moderatorName.Substring(startIndex);
-                //string extractedString = 
-                string modLogname = Main.AllPlayerNames.TryGetValue(player.PlayerId, out var n1) ? n1 : "";
-                string banlogname = Main.AllPlayerNames.TryGetValue(bannedPlayer.PlayerId, out var n11) ? n11 : "";
+                Utils.SendMessage(textToSend1.ToString());
+                string modLogname = Main.AllPlayerNames.GetValueOrDefault(player.PlayerId, string.Empty);
+                string banlogname = Main.AllPlayerNames.GetValueOrDefault(bannedPlayer.PlayerId, string.Empty);
                 string moderatorFriendCode = player.FriendCode.ToString();
                 string bannedPlayerFriendCode = bannedPlayer.FriendCode.ToString();
                 string bannedPlayerHashPuid = bannedPlayer.GetClient().GetHashedPuid();
@@ -2790,7 +2822,6 @@ internal class ChatCommands
                 // warn the specified player
                 string warnReason = "Reason : Not specified\n";
                 string warnedPlayerName = warnedPlayer.GetRealName();
-                //textToSend2 = $" {warnedPlayerName} {GetString("WarnCommandWarned")} ~{player.name}";
                 if (args.Length > 2)
                 {
                     warnReason = "Reason : " + string.Join(" ", args.Skip(2)) + "\n";
@@ -2800,11 +2831,8 @@ internal class ChatCommands
                     Utils.SendMessage("Use /warn [id] [reason] in future. \nExample :-\n /warn 5 lava chatting", player.PlayerId);
                 }
                 Utils.SendMessage($" {warnedPlayerName} {GetString("WarnCommandWarned")} {warnReason} ~{player.name}");
-                //string moderatorName1 = player.GetRealName().ToString();
-                //int startIndex1 = moderatorName1.IndexOf("♥</color>") + "♥</color>".Length;
-                //moderatorName1 = moderatorName1.Substring(startIndex1);
-                string modLogname1 = Main.AllPlayerNames.TryGetValue(player.PlayerId, out var n2) ? n2 : "";
-                string warnlogname = Main.AllPlayerNames.TryGetValue(warnedPlayer.PlayerId, out var n12) ? n12 : "";
+                string modLogname1 = Main.AllPlayerNames.GetValueOrDefault(player.PlayerId, string.Empty);
+                string warnlogname = Main.AllPlayerNames.GetValueOrDefault(warnedPlayer.PlayerId, string.Empty);
                 string moderatorFriendCode1 = player.FriendCode.ToString();
                 string warnedPlayerFriendCode = warnedPlayer.FriendCode.ToString();
                 string warnedPlayerHashPuid = warnedPlayer.GetClient().GetHashedPuid();
@@ -2870,18 +2898,15 @@ internal class ChatCommands
                 {
                     Utils.SendMessage("Use /kick [id] [reason] in future. \nExample :-\n /kick 5 not following rules", player.PlayerId);
                 }
-                string textToSend = $"{kickedPlayerName} {GetString("KickCommandKicked")} {player.name} \n {kickReason}";
+                var textToSend = new StringBuilder($"{kickedPlayerName} {GetString("KickCommandKicked")} {player.name} \n {kickReason}");
 
                 if (GameStates.IsInGame)
                 {
-                    textToSend += $" {GetString("KickCommandKickedRole")} {GetString(kickedPlayer.GetCustomRole().ToString())}";
+                    textToSend.Append($" {GetString("KickCommandKickedRole")} {GetString(kickedPlayer.GetCustomRole().ToString())}");
                 }
-                Utils.SendMessage(textToSend);
-                //string moderatorName2 = player.GetRealName().ToString();
-                //int startIndex2 = moderatorName2.IndexOf("♥</color>") + "♥</color>".Length;
-                //moderatorName2 = moderatorName2.Substring(startIndex2);
-                string modLogname2 = Main.AllPlayerNames.TryGetValue(player.PlayerId, out var n3) ? n3 : "";
-                string kicklogname = Main.AllPlayerNames.TryGetValue(kickedPlayer.PlayerId, out var n13) ? n13 : "";
+                Utils.SendMessage(textToSend.ToString());
+                string modLogname2 = Main.AllPlayerNames.GetValueOrDefault(player.PlayerId, string.Empty);
+                string kicklogname = Main.AllPlayerNames.GetValueOrDefault(kickedPlayer.PlayerId, string.Empty);
 
                 string moderatorFriendCode2 = player.FriendCode.ToString();
                 string kickedPlayerFriendCode = kickedPlayer.FriendCode.ToString();
@@ -2944,8 +2969,6 @@ internal class ChatCommands
                         Logger.Msg($"File Not exist, creating file at {modTagsFiles}/{player.FriendCode}.txt", "modcolor");
                         File.Create(colorFilePath).Close();
                     }
-                    //Logger.Msg($"File exists, creating file at {modTagsFiles}/{player.FriendCode}.txt", "modcolor");
-                    //Logger.Msg($"{subArgs}","modcolor");
                     File.WriteAllText(colorFilePath, $"{subArgs}");
                     break;
                 }
@@ -3003,8 +3026,6 @@ internal class ChatCommands
                         Logger.Msg($"File Not exist, creating file at {vipTagsFiles}/{player.FriendCode}.txt", "vipcolor");
                         File.Create(colorFilePathh).Close();
                     }
-                    //Logger.Msg($"File exists, creating file at {vipTagsFiles}/{player.FriendCode}.txt", "vipcolor");
-                    //Logger.Msg($"{subArgs}","modcolor");
                     File.WriteAllText(colorFilePathh, $"{subArgs}");
                     break;
                 }
@@ -3012,8 +3033,8 @@ internal class ChatCommands
             case "/tagcolour":
             case "/标签颜色":
             case "/附加名称颜色":
-                string name1 = Main.AllPlayerNames.TryGetValue(player.PlayerId, out var n) ? n : "";
-                if (name1 == "") break;
+                string name1 = Main.AllPlayerNames.GetValueOrDefault(player.PlayerId, string.Empty);
+                if (name1 == string.Empty) break;
                 if (!name1.Contains('\r') && player.FriendCode.GetDevUser().HasTag())
                 {
                     if (!GameStates.IsLobby)
@@ -3054,7 +3075,6 @@ internal class ChatCommands
                     pc.RpcSetNameEx(pc.GetRealName(isMeeting: true));
                 }
                 ChatUpdatePatch.DoBlockChat = false;
-                //Utils.NotifyRoles(isForMeeting: GameStates.IsMeeting, NoCache: true);
                 Utils.SendMessage(GetString("Message.TryFixName"), player.PlayerId);
                 break;
 
@@ -3154,11 +3174,8 @@ internal class ChatCommands
                         var modTitle = (Utils.IsPlayerModerator(player.FriendCode) || TagManager.ReadPermission(player.FriendCode) >= 2) ? $"<color=#8bbee0>{GetString("MessageFromModerator")}" : $"<color=#ffff00>{GetString("MessageFromVIP")}";
                         if (args.Length > 1)
                             Utils.SendMessage(args.Skip(1).Join(delimiter: " "), title: $"{modTitle} ~ <size=1.25>{player.GetRealName(clientData: true)}</size></color>");
-                        //string moderatorName3 = player.GetRealName().ToString();
-                        //int startIndex3 = moderatorName3.IndexOf("♥</color>") + "♥</color>".Length;
-                        //moderatorName3 = moderatorName3.Substring(startIndex3);
-                        string modLogname3 = Main.AllPlayerNames.TryGetValue(player.PlayerId, out var n4) ? n4 : "";
-
+                        string modLogname3 = Main.AllPlayerNames.GetValueOrDefault(player.PlayerId, string.Empty);
+                        
                         string moderatorFriendCode3 = player.FriendCode.ToString();
                         string logMessage3 = $"[{DateTime.Now}] {moderatorFriendCode3},{modLogname3} used /s: {args.Skip(1).Join(delimiter: " ")}";
                         File.AppendAllText(modLogFiles, logMessage3 + Environment.NewLine);
@@ -3168,7 +3185,6 @@ internal class ChatCommands
                 break;
             case "/rps":
             case "/剪刀石头布":
-                //canceled = true;
                 if (!Options.CanPlayMiniGames.GetBool())
                 {
                     Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
@@ -3215,7 +3231,6 @@ internal class ChatCommands
                 }
             case "/coinflip":
             case "/抛硬币":
-                //canceled = true;
                 if (!Options.CanPlayMiniGames.GetBool())
                 {
                     Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
@@ -3242,7 +3257,6 @@ internal class ChatCommands
                     Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
                     break;
                 }
-                //canceled = true;
                 if (!GameStates.IsLobby && player.IsAlive())
                 {
                     Utils.SendMessage(GetString("GNoCommandInfo"), player.PlayerId);
@@ -3273,7 +3287,6 @@ internal class ChatCommands
                     {
                         Main.GuessNumber[player.PlayerId][0] = -1;
                         Main.GuessNumber[player.PlayerId][1] = 7;
-                        //targetNumber = Main.GuessNumber[player.PlayerId][0];
                         Utils.SendMessage(string.Format(GetString("GNoLost"), targetNumber), player.PlayerId);
                         break;
                     }
@@ -3388,7 +3401,7 @@ internal class ChatCommands
                         str = GetString("8BallWithDoubt");
                         break;
                 }
-                Utils.SendMessage("<align=\"center\"><size=150%>" + str + "</align></size>", player.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Medium), GetString("8BallTitle")));
+                Utils.SendMessage("<align=\"center\"><size=150%>" + str + "</align></size>", player.PlayerId, CustomRoles.Medium.GetColoredTextByRole(GetString("8BallTitle")));
                 break;
             case "/me":
             case "/我的权限":
@@ -3594,11 +3607,9 @@ class ChatUpdatePatch
                      ?? Main.AllPlayerControls.ToArray().OrderBy(x => x.PlayerId).FirstOrDefault()
                      ?? player;
         }
-        //Logger.Info($"player is null? {player == null}", "ChatUpdatePatch");
         if (player == null) return;
 
         (string msg, byte sendTo, string title) = Main.MessagesToSend[0];
-        //Logger.Info($"MessagesToSend - sendTo: {sendTo} - title: {title}", "ChatUpdatePatch");
 
         if (sendTo != byte.MaxValue && GameStates.IsLobby)
         {
@@ -3626,14 +3637,14 @@ class ChatUpdatePatch
         if (clientId == -1)
         {
             player.SetName(title);
-            DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg, false);
+            FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg, false);
             player.SetName(name);
         }
 
         if (clientId == AmongUsClient.Instance.ClientId || sendTo == PlayerControl.LocalPlayer.PlayerId)
         {
             player.SetName(title);
-            DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg, false);
+            FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg, false);
             player.SetName(name);
             return;
         }
@@ -3691,10 +3702,10 @@ class RpcSendChatPatch
         }
         int return_count = PlayerControl.LocalPlayer.name.Count(x => x == '\n');
         chatText = new StringBuilder(chatText).Insert(0, "\n", return_count).ToString();
-        if (AmongUsClient.Instance.AmClient && DestroyableSingleton<HudManager>.Instance)
-            DestroyableSingleton<HudManager>.Instance.Chat.AddChat(__instance, chatText);
+        if (AmongUsClient.Instance.AmClient && FastDestroyableSingleton<HudManager>.Instance)
+            FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(__instance, chatText);
         if (chatText.Contains("who", StringComparison.OrdinalIgnoreCase))
-            DestroyableSingleton<UnityTelemetry>.Instance.SendWho();
+            FastDestroyableSingleton<UnityTelemetry>.Instance.SendWho();
         MessageWriter messageWriter = AmongUsClient.Instance.StartRpc(__instance.NetId, (byte)RpcCalls.SendChat, SendOption.None);
         messageWriter.Write(chatText);
         messageWriter.EndMessage();

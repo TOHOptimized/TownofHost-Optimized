@@ -55,7 +55,7 @@ internal class President : RoleBase
         RevealLimit.Remove(playerId);
     }
 
-    public static bool CheckReveal(byte targetId) => CheckPresidentReveal.TryGetValue(targetId, out var canBeReveal) && canBeReveal;
+    public static bool CheckReveal(byte targetId) => CheckPresidentReveal.GetValueOrDefault(targetId, false);
 
     public static void TryHideMsgForPresident()
     {
@@ -69,20 +69,20 @@ internal class President : RoleBase
         }
 
         var rd = IRandom.Instance;
-        string msg;
+         var msg = new System.Text.StringBuilder();
         for (int i = 0; i < 20; i++)
         {
-            msg = "/";
+            msg.Clear().Append('/');
             if (rd.Next(1, 100) < 20)
-                msg += "finish";
+                msg.Append("finish");
             else
-                msg += "reveal";
+                msg.Append("reveal");
             var player = Main.AllAlivePlayerControls.RandomElement();
-            DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg);
+            FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg.ToString());
             var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
             writer.StartMessage(-1);
             writer.StartRpc(player.NetId, (byte)RpcCalls.SendChat)
-                .Write(msg)
+                .Write(msg.ToString())
                 .EndRpc();
             writer.EndMessage();
             writer.SendMessage();
@@ -166,7 +166,7 @@ internal class President : RoleBase
                 if (!NeutralsSeePresident.GetBool() && tar.GetCustomRole().IsNeutral()) continue;
                 if (!ImpsSeePresident.GetBool() && (tar.GetCustomRole().IsImpostor() || tar.Is(CustomRoles.Crewpostor))) continue;
                 if (!CovenSeePresident.GetBool() && tar.GetCustomRole().IsCoven()) continue;
-                Utils.SendMessage(string.Format(GetString("PresidentRevealed"), pc.GetRealName()), tar.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.President), GetString("PresidentRevealTitle")));
+                 Utils.SendMessage(string.Format(GetString("PresidentRevealed"), pc.GetRealName()), tar.PlayerId, CustomRoles.President.GetColoredTextByRole(GetString("PresidentRevealTitle")));
             }
             SendRPC(pc.PlayerId, isEnd: false);
         }

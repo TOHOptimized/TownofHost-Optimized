@@ -144,7 +144,7 @@ internal class Alchemist : RoleBase
         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetAlchemistTimer, SendOption.Reliable, pc.GetClientId());
         writer.Write(FixNextSabo);
         writer.Write(PotionID);
-        writer.Write((InvisTime.TryGetValue(pc.PlayerId, out var x) ? x : -1).ToString());
+        writer.Write(InvisTime.GetValueOrDefault(pc.PlayerId, -1).ToString());
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
     public static void ReceiveRPC(MessageReader reader)
@@ -225,7 +225,7 @@ internal class Alchemist : RoleBase
 
             if (remainTime < 0 || !alchemist.IsAlive())
             {
-                alchemist?.MyPhysics?.RpcBootFromVent(ventedId.TryGetValue(alchemistId, out var id) ? id : Main.LastEnteredVent[alchemistId].Id);
+                alchemist?.MyPhysics?.RpcBootFromVent(ventedId.GetValueOrDefault(alchemistId, Main.LastEnteredVent[alchemistId].Id));
 
                 ventedId.Remove(alchemistId);
 
@@ -255,7 +255,7 @@ internal class Alchemist : RoleBase
             var alchemist = Utils.GetPlayerById(alchemistId);
             if (alchemist == null) continue;
 
-            alchemist?.MyPhysics?.RpcBootFromVent(ventedId.TryGetValue(alchemistId, out var id) ? id : Main.LastEnteredVent[alchemistId].Id);
+            alchemist?.MyPhysics?.RpcBootFromVent(ventedId.GetValueOrDefault(alchemistId, Main.LastEnteredVent[alchemistId].Id));
             InvisTime.Remove(alchemistId);
             ventedId.Remove(alchemistId);
             SendRPC(alchemist);
@@ -383,7 +383,7 @@ internal class Alchemist : RoleBase
         var str = new StringBuilder();
         if (IsInvis(seer.PlayerId))
         {
-            var remainTime = InvisTime[seer.PlayerId] + (long)InvisDuration.GetFloat() - Utils.GetTimeStamp();
+            var remainTime = InvisTime[seer.PlayerId] + (long)InvisDuration.GetFloat() - Utils.TimeStamp;
             str.Append(string.Format(GetString("ChameleonInvisStateCountdown"), remainTime + 1));
         }
         else
@@ -426,7 +426,7 @@ internal class Alchemist : RoleBase
     }
     public override string GetProgressText(byte playerId, bool comms)
     {
-        var player = Utils.GetPlayerById(playerId);
+        var player = playerId.GetPlayer();
         if (player == null || !GameStates.IsInTask) return string.Empty;
 
         var str = new StringBuilder();

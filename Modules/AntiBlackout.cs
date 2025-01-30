@@ -237,7 +237,7 @@ public static class AntiBlackout
     {
         var timeNotify = 0f;
 
-        if (CheckForEndVotingPatch.TempExileMsg != null && BlackOutIsActive)
+        if (BlackOutIsActive && CheckForEndVotingPatch.TempExileMsg != null)
         {
             timeNotify = 4f;
             foreach (var pc in Main.AllPlayerControls.Where(p => !p.IsModded()).ToArray())
@@ -297,23 +297,21 @@ public static class AntiBlackout
                 }
             }
 
-            if (!isDead && seerId == targetId && seer.HasImpKillButton()) continue;
+            if (!isDead && isSelf && seer.HasImpKillButton()) continue;
+            
             target.RpcSetRoleDesync(changedRoleType, seer.GetClientId());
         }
+        ResetAllCooldown();
     }
     private static void ResetAllCooldown()
     {
         foreach (var seer in Main.AllPlayerControls)
         {
-            if (seer.HasGhostRole())
-            {
-                seer.RpcResetAbilityCooldown();
-            }
+            seer.RpcResetAbilityCooldown();
         }
     }
     public static void ResetAfterMeeting()
     {
-        ResetAllCooldown();
         // add 1 second delay
         _ = new LateTask(() =>
         {

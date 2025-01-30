@@ -16,11 +16,8 @@ namespace TOHE;
 [HarmonyPatch]
 public class ModUpdater
 {
-    //private static readonly string URL_2018k = "http://api.tohre.dev";
     private static readonly string URL_Github = "https://api.github.com/repos/0xDrMoe/TownofHost-Enhanced";
-    //public static readonly string downloadTest = "https://github.com/Pietrodjaowjao/TOHEN-Contributions/releases/download/v123123123/TOHE.dll";
     public static bool hasUpdate = false;
-    //public static bool isNewer = false;
     public static bool forceUpdate = false;
     public static bool isBroken = false;
     public static bool isChecked = false;
@@ -70,7 +67,7 @@ public class ModUpdater
     const string MiniRegionInstallResource = "TOHE.Resources.Mini.RegionInstall.dll";
     private static void CheckCustomRegions()
     {
-        var regions = ServerManager.Instance.AvailableRegions;
+        var regions = FastDestroyableSingleton<ServerManager>.Instance.AvailableRegions;
         var hasCustomRegions = false;
         var forceUpdate = false;
 
@@ -205,7 +202,7 @@ public class ModUpdater
             latestVersion = DateTime.TryParse(publishedAt, out DateTime parsedDate) ? parsedDate : DateTime.MinValue;
             latestTitle = $"Day: {latestVersion?.Day} Month: {latestVersion?.Month} Year: {latestVersion?.Year}";
 
-            JArray assets = data["assets"].TryCast<JArray>();
+            JArray assets = data["assets"].CastFast<JArray>();
             for (int i = 0; i < assets.Count; i++)
             {
                 string assetName = assets[i]["name"].ToString();
@@ -217,7 +214,7 @@ public class ModUpdater
             }
 
             DateTime pluginTimestamp = DateTime.ParseExact(Main.PluginVersion.Substring(5, 4), "MMdd", System.Globalization.CultureInfo.InvariantCulture);
-            int year = int.Parse(Main.PluginVersion.Substring(0, 4));
+            int year = int.Parse(Main.PluginVersion[..4]);
             pluginTimestamp = pluginTimestamp.AddYears(year - pluginTimestamp.Year);
             Logger.Info($"Day: {pluginTimestamp.Day} Month: {pluginTimestamp.Month} Year: {pluginTimestamp.Year}", "PluginVersion");
             hasUpdate = latestVersion?.Date > pluginTimestamp.Date;

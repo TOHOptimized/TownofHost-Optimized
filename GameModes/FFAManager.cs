@@ -1,4 +1,5 @@
 ﻿using Hazel;
+using System.Text;
 using TOHE.Modules;
 using UnityEngine;
 using static TOHE.Translator;
@@ -160,7 +161,7 @@ internal static class FFAManager
     public static string GetDisplayScore(byte playerId)
     {
         int rank = GetRankOfScore(playerId);
-        string score = KBScore.TryGetValue(playerId, out var s) ? $"{s}" : "0";
+        string score = KBScore.GetValueOrDefault(playerId, 0).ToString();
         string text = string.Format(GetString("FFADisplayScore"), rank.ToString(), score);
         Color color = Utils.GetRoleColor(CustomRoles.Killer);
         return Utils.ColorString(color, text);
@@ -338,8 +339,10 @@ internal static class FFAManager
 
     public static void OnPlayerKill(PlayerControl killer)
     {
-        if (PlayerControl.LocalPlayer.Is(CustomRoles.GM))
-            PlayerControl.LocalPlayer.KillFlash();
+        foreach (var player in Main.AllPlayerControls.Where(x => x.Is(CustomRoles.GM)))
+        {
+            player.KillFlash();
+        }
 
         KBScore[killer.PlayerId]++;
     }
@@ -403,7 +406,7 @@ internal static class FFAManager
         if (target != null && seer.PlayerId != target.PlayerId) return string.Empty;
         if (Main.AllAlivePlayerControls.Length != 2) return string.Empty;
 
-        string arrows = string.Empty;
+        var arrows = new StringBuilder();
         PlayerControl otherPlayer = null;
         foreach (var pc in Main.AllAlivePlayerControls.Where(pc => pc.IsAlive() && pc.PlayerId != seer.PlayerId).ToArray())
         {
@@ -413,9 +416,9 @@ internal static class FFAManager
         if (otherPlayer == null) return string.Empty;
 
         var arrow = TargetArrow.GetArrows(seer, otherPlayer.PlayerId);
-        arrows += Utils.ColorString(Utils.GetRoleColor(CustomRoles.Killer), arrow);
+        arrows.Append(CustomRoles.Killer.GetColoredTextByRole(arrow));
 
-        return arrows;
+        return arrows.ToString();
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]

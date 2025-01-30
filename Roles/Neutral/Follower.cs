@@ -118,7 +118,7 @@ internal class Follower : RoleBase
         killer.Notify(GetString("FollowerBetPlayer"));
 
         if (BetTargetKnowFollower.GetBool())
-            target.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Follower), GetString("FollowerBetOnYou")));
+            target.Notify(CustomRoles.Follower.GetColoredTextByRole(GetString("FollowerBetOnYou")));
 
         Logger.Info($" {killer.GetNameWithRole()} => {target.GetNameWithRole()}", "Follower");
         return false;
@@ -131,10 +131,10 @@ internal class Follower : RoleBase
         {
             if (!BetTargetKnowFollower.GetBool()) return string.Empty;
             return (BetPlayer.TryGetValue(target.PlayerId, out var x) && seer.PlayerId == x) ?
-                Utils.ColorString(Utils.GetRoleColor(CustomRoles.Follower), "♦") : string.Empty;
+                CustomRoles.Follower.GetColoredTextByRole("♦") : string.Empty;
         }
         var GetValue = BetPlayer.TryGetValue(seer.PlayerId, out var targetId);
-        return GetValue && targetId == target.PlayerId ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Follower), "♦") : string.Empty;
+        return GetValue && targetId == target.PlayerId ? CustomRoles.Follower.GetColoredTextByRole("♦") : string.Empty;
     }
     public override string GetProgressText(byte playerId, bool coooms)
     {

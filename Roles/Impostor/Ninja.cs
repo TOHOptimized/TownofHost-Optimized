@@ -61,7 +61,7 @@ internal class Ninja : RoleBase
             MarkedPlayer.Add(playerId, targetId);
     }
 
-    private static bool Shapeshifting(byte id) => Main.CheckShapeshift.TryGetValue(id, out bool shapeshifting) && shapeshifting;
+    private static bool Shapeshifting(byte id) => Main.CheckShapeshift.GetValueOrDefault(id, false);
 
     public override void SetKillCooldown(byte id)
         => Main.AllPlayerKillCooldown[id] = Shapeshifting(id) ? DefaultKillCooldown : MarkCooldown.GetFloat();
@@ -77,7 +77,7 @@ internal class Ninja : RoleBase
     {
         if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
         {
-            killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Gangster), GetString("CantMark")));
+            killer.Notify(CustomRoles.Gangster.GetColoredTextByRole(GetString("CantMark")));
             return true;
         }
 

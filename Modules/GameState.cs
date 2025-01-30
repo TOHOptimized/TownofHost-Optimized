@@ -50,7 +50,7 @@ public class PlayerState(byte playerId)
         {
             if (AmongUsClient.Instance.AmHost)
             {
-                if (!pc.HasImpKillButton(considerVanillaShift: true))
+                if (!pc.HasImpKillButton()) return;
                 {
                     var taskstate = pc.GetPlayerTaskState();
                     if (taskstate != null)
@@ -489,10 +489,7 @@ public class PlayerVersion(Version ver, string tag_str, string forkId)
     public readonly Version version = ver;
     public readonly string tag = tag_str;
     public readonly string forkId = forkId;
-#pragma warning disable CA1041 // Provide ObsoleteAttribute message
-    [Obsolete] public PlayerVersion(string ver, string tag_str) : this(Version.Parse(ver), tag_str, string.Empty) { }
-    [Obsolete] public PlayerVersion(Version ver, string tag_str) : this(ver, tag_str, string.Empty) { }
-#pragma warning restore CA1041
+    
     public PlayerVersion(string ver, string tag_str, string forkId) : this(Version.Parse(ver), tag_str, forkId) { }
 
     public bool IsEqual(PlayerVersion pv)
@@ -528,7 +525,7 @@ public static class GameStates
             const string Domain = "among.us";
 
             // From Reactor.gg
-            return ServerManager.Instance.CurrentRegion?.TryCast<StaticHttpRegionInfo>() is { } regionInfo &&
+            return FastDestroyableSingleton<ServerManager>.Instance.CurrentRegion?.CastFast<StaticHttpRegionInfo>() is { } regionInfo &&
                    regionInfo.PingServer.EndsWith(Domain, StringComparison.Ordinal) &&
                    regionInfo.Servers.All(serverInfo => serverInfo.Ip.EndsWith(Domain, StringComparison.Ordinal));
         }

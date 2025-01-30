@@ -87,8 +87,8 @@ internal class ChiefOfPolice : RoleBase
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
 
-                killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.ChiefOfPolice), GetString("SheriffSuccessfullyRecruited")));
-                target.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.ChiefOfPolice), GetString("BeSheriffByPolice")));
+                killer.Notify(CustomRoles.ChiefOfPolice.GetColoredTextByRole(GetString("SheriffSuccessfullyRecruited")));
+                target.Notify(CustomRoles.ChiefOfPolice.GetColoredTextByRole(GetString("BeSheriffByPolice")));
 
                 Utils.NotifyRoles(killer);
                 Utils.NotifyRoles(target);
@@ -97,7 +97,11 @@ internal class ChiefOfPolice : RoleBase
         }
         else
         {
-            if (!CanRecruitCoven.GetBool() && target.IsPlayerCovenTeam() || !CanRecruitNeutral.GetBool() && target.IsPlayerNeutralTeam() || !CanRecruitImpostor.GetBool() && target.IsPlayerImpostorTeam())
+            if (!CanRecruitCoven.GetBool() && target.IsPlayerCovenTeam() || !CanRecruitNeutral.GetBool() && target.IsPlayerNeutralTeam() || !CanRecruitImpostor.GetBool() && target.IsPlayerImpostorTeam() || target.IsNeutralApocalypse())
+            {
+                suidice = true;
+            }
+            if (target.Is(CustomRoles.Zombie) || target.Is(CustomRoles.EvilMini)|| target.Is(CustomRoles.Loyal))
             {
                 suidice = true;
             }
@@ -122,8 +126,8 @@ internal class ChiefOfPolice : RoleBase
                     target.ResetKillCooldown();
                     target.SetKillCooldown(forceAnime: true);
 
-                    killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.ChiefOfPolice), GetString("SheriffSuccessfullyRecruited")));
-                    target.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.ChiefOfPolice), GetString("BeSheriffByPolice")));
+                    killer.Notify(CustomRoles.ChiefOfPolice.GetColoredTextByRole(GetString("SheriffSuccessfullyRecruited")));
+                    target.Notify(CustomRoles.ChiefOfPolice.GetColoredTextByRole(GetString("BeSheriffByPolice")));
 
                     Utils.NotifyRoles(killer);
                     Utils.NotifyRoles(target);
@@ -156,7 +160,7 @@ internal class ChiefOfPolice : RoleBase
         {
             killer.ResetKillCooldown();
             killer.SetKillCooldown(forceAnime: true);
-            killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.ChiefOfPolice), GetString("PoliceFailedRecruit")));
+            killer.Notify(CustomRoles.ChiefOfPolice.GetColoredTextByRole(GetString("PoliceFailedRecruit")));
             Utils.NotifyRoles(killer);
         }
 

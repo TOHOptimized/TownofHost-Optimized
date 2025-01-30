@@ -186,7 +186,7 @@ namespace TOHE.Modules.ChatManager
                         writer.Write((uint)randomString);
                         writer.Write((byte)0);
                         writer.EndRpc();
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(randomString), false);
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(randomString), false);
                     }
                     break;
                 case QuickChatSpamMode.QuickChatSpam_How2PlayNormal:
@@ -200,8 +200,8 @@ namespace TOHE.Modules.ChatManager
                         writer.Write((byte)QuickChatPhraseType.SimplePhrase);
                         writer.Write((uint)names);
                         writer.EndRpc();
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
                     }
                     break;
                 case QuickChatSpamMode.QuickChatSpam_How2PlayHidenSeek:
@@ -215,8 +215,8 @@ namespace TOHE.Modules.ChatManager
                         writer.Write((byte)QuickChatPhraseType.SimplePhrase);
                         writer.Write((uint)names);
                         writer.EndRpc();
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
                     }
                     break;
                 case QuickChatSpamMode.QuickChatSpam_EzHacked:
@@ -230,8 +230,8 @@ namespace TOHE.Modules.ChatManager
                         writer.Write((byte)QuickChatPhraseType.SimplePhrase);
                         writer.Write((uint)names);
                         writer.EndRpc();
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
                     }
                     break;
             }
@@ -255,22 +255,18 @@ namespace TOHE.Modules.ChatManager
                 }
                 else
                 {
-                    var firstAlivePlayer = Main.AllAlivePlayerControls.OrderBy(x => x.PlayerId).FirstOrDefault();
-                    if (firstAlivePlayer == null) firstAlivePlayer = PlayerControl.LocalPlayer;
-
+                    var firstAlivePlayer = Main.AllAlivePlayerControls.OrderBy(x => x.PlayerId).FirstOrDefault() ?? PlayerControl.LocalPlayer;
                     var title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
                     var name = firstAlivePlayer?.Data?.PlayerName;
                     string spamMsg = GetString("ExileSpamMsg");
 
                     for (int i = 0; i < 20 - chatHistory.Count; i++)
                     {
-                        int clientId = -1; //sendTo == byte.MaxValue ? -1 : Utils.GetPlayerById(sendTo).GetClientId();
-                                           //if (clientId == -1)
-                                           //{
+                        int clientId = -1; 
                         firstAlivePlayer.SetName(title);
                         DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, spamMsg);
                         firstAlivePlayer.SetName(name);
-                        //}
+                        
                         var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
                         writer.StartMessage(clientId);
                         writer.StartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SetName)
@@ -286,57 +282,9 @@ namespace TOHE.Modules.ChatManager
                             .EndRpc();
                         writer.EndMessage();
                         writer.SendMessage();
-                        //DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, spamMsg);
-                        //var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
-
-                        //writer.StartMessage(-1);
-                        //writer.StartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SendChat)
-                        //    .Write(spamMsg)
-                        //    .EndRpc()
-                        //    .EndMessage()
-                        //    .SendMessage();
                     }
                 }
             }
-            //var rd = IRandom.Instance;
-            //CustomRoles[] roles = (CustomRoles[])Enum.GetValues(typeof(CustomRoles));
-            //string[] specialTexts = new string[] { "bet", "bt", "guess", "gs", "shoot", "st", "赌", "猜", "审判", "tl", "判", "审", "trial" };
-            //int numPlayers = Main.AllAlivePlayerControls.Count();
-            //var allAlivePlayers = Main.AllAlivePlayerControls.ToArray();
-            //int roleCount = roles.Length;
-
-            //for (int i = chatHistory.Count; i < 30; i++)
-            //{
-            //    StringBuilder msgBuilder = new();
-            //    msgBuilder.Append('/');
-            //    if (rd.Next(1, 100) < 20)
-            //    {
-            //        msgBuilder.Append("id");
-            //    }
-            //    else
-            //    {
-            //        msgBuilder.Append(specialTexts[rd.Next(specialTexts.Length)]);
-            //        msgBuilder.Append(rd.Next(1, 100) < 50 ? string.Empty : " ");
-            //        msgBuilder.Append(rd.Next(15));
-            //        msgBuilder.Append(rd.Next(1, 100) < 50 ? string.Empty : " ");
-            //        CustomRoles role = roles[rd.Next(roleCount)];
-            //        msgBuilder.Append(rd.Next(1, 100) < 50 ? string.Empty : " ");
-            //        msgBuilder.Append(Utils.GetRoleName(role));
-            //    }
-            //    string msg = msgBuilder.ToString();
-
-            //    var player = allAlivePlayers[rd.Next(numPlayers)];
-            //    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg);
-            //    var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
-
-            //    writer.StartMessage(-1);
-            //    writer.StartRpc(player.NetId, (byte)RpcCalls.SendChat)
-            //        .Write(msg)
-            //        .EndRpc()
-            //        .EndMessage()
-            //        .SendMessage();
-            //}
-
             for (int i = 0; i < chatHistory.Count; i++)
             {
                 var entry = chatHistory[i];

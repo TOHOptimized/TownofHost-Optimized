@@ -101,10 +101,10 @@ class ExileControllerWrapUpPatch
             exiled.PlayerId.SetDeathReason(PlayerState.DeathReason.Vote);
 
             var exiledRoleClass = exiled.PlayerId.GetRoleClassById();
-            var emptyString = string.Empty;
+            var emptyStringBuilder = new System.Text.StringBuilder();
 
-            exiledRoleClass?.CheckExile(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyString);
-            CustomRoleManager.AllEnabledRoles.Do(roleClass => roleClass.CheckExileTarget(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyString));
+            exiledRoleClass?.CheckExile(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyStringBuilder);
+            CustomRoleManager.AllEnabledRoles.Do(roleClass => roleClass.CheckExileTarget(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyStringBuilder));
 
             if (CustomWinnerHolder.WinnerTeam != CustomWinner.Terrorist) Main.PlayerStates[exiled.PlayerId].SetDead();
         }
@@ -150,7 +150,7 @@ class ExileControllerWrapUpPatch
                 {
                     exiled.Object.RpcExileV2();
                 }
-            }, 0.7f, "Restore IsDead Task");
+            }, 0.6f, "Restore IsDead Task");
 
             _ = new LateTask(() =>
             {
@@ -179,19 +179,14 @@ class ExileControllerWrapUpPatch
                 Utils.SyncAllSettings();
                 Utils.CheckAndSetVentInteractions();
                 Utils.NotifyRoles(NoCache: true);
-            }, 1.2f, "AfterMeetingDeathPlayers Task");
-
-            _ = new LateTask(() =>
-            {
-                if (GameStates.IsEnded) return;
 
                 AntiBlackout.ResetAfterMeeting();
-                Main.LastMeetingEnded = Utils.GetTimeStamp();
-            }, 1.5f, "Reset Cooldown After Meeting");
+                Main.LastMeetingEnded = Utils.TimeStamp;
+            }, 1f, "AfterMeetingDeathPlayers Task");
         }
 
         //This should happen shortly after the Exile Controller wrap up finished for clients
-        //For Certain Laggy clients 0.8f delay is still not enough. The finish time can differ.
+        //For Certain Laggy clients 0.8f delay is still not enough. The finish time can differ
         //If the delay is too long, it will influence other normal players' view
 
         GameStates.AlreadyDied |= !Utils.IsAllAlive;
@@ -201,7 +196,7 @@ class ExileControllerWrapUpPatch
         _ = new LateTask(() =>
         {
             if (!AmongUsClient.Instance.IsGameOver)
-                DestroyableSingleton<HudManager>.Instance.SetHudActive(true);
+                FastDestroyableSingleton<HudManager>.Instance.SetHudActive(true);
         }, 0.8f, "Set Hud Active");
 
         Logger.Info("Start of Task Phase", "Phase");

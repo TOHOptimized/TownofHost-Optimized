@@ -70,13 +70,13 @@ internal class Randomizer : IAddon
                 delay = Math.Max(delay, 0.15f);
                 if (delay > 0.15f && BecomeBaitDelayNotify.GetBool())
                 {
-                    killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Bait), string.Format(GetString("KillBaitNotify"), (int)delay)), delay);
+                    killer.Notify(CustomRoles.Bait.GetColoredTextByRole(string.Format(GetString("KillBaitNotify"), (int)delay)), delay);
                 }
 
                 Logger.Info($"{killer.GetNameWithRole()} 击杀了萧暮触发自动报告 => {target.GetNameWithRole()}", "Randomizer");
 
-                killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Randomizer), GetString("YouKillRandomizer1")));
-
+                killer.Notify(CustomRoles.Randomizer.GetColoredTextByRole(GetString("YouKillRandomizer1")));
+                
                 _ = new LateTask(() =>
                 {
                     if (GameStates.IsInTask) killer.CmdReportDeadBody(target.Data);
@@ -87,7 +87,7 @@ internal class Randomizer : IAddon
         {
             Logger.Info($"{killer.GetNameWithRole()} 击杀了萧暮触发暂时无法移动 => {target.GetNameWithRole()}", "Randomizer");
 
-            killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Randomizer), GetString("YouKillRandomizer2")));
+            killer.Notify(CustomRoles.Randomizer.GetColoredTextByRole(GetString("YouKillRandomizer2")));
             var tmpSpeed = Main.AllPlayerSpeed[killer.PlayerId];
             Main.AllPlayerSpeed[killer.PlayerId] = Main.MinSpeed;
             ReportDeadBodyPatch.CanReport[killer.PlayerId] = false;
@@ -104,14 +104,14 @@ internal class Randomizer : IAddon
         else if (Randomizer == 3)
         {
             Logger.Info($"{killer.GetNameWithRole()} 击杀了萧暮触发凶手CD变成600 => {target.GetNameWithRole()}", "Randomizer");
-            killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Randomizer), GetString("YouKillRandomizer3")));
+            killer.Notify(CustomRoles.Randomizer.GetColoredTextByRole(GetString("YouKillRandomizer3")));
             Main.AllPlayerKillCooldown[killer.PlayerId] = 600f;
             killer.SyncSettings();
         }
         else if (Randomizer == 4)
         {
             Logger.Info($"{killer.GetNameWithRole()} 击杀了萧暮触发随机复仇 => {target.GetNameWithRole()}", "Randomizer");
-            killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Randomizer), GetString("YouKillRandomizer4")));
+            killer.Notify(CustomRoles.Randomizer.GetColoredTextByRole(GetString("YouKillRandomizer4")));
             {
                 var pcList = Main.AllAlivePlayerControls.Where(x => x.PlayerId != target.PlayerId && target.RpcCheckAndMurder(x, true)).ToList();
                 var pc = pcList[IRandom.Instance.Next(0, pcList.Count)];

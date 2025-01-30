@@ -23,6 +23,7 @@ public static class CustomRolesHelper
 
         // Vanilla roles
         if (role.IsVanilla()) return role;
+        if (role is CustomRoles.GM) return CustomRoles.Crewmate;
 
         // Role base
         if (role.GetStaticRoleClass() is not DefaultSetup) return role.GetStaticRoleClass().ThisRoleBase;
@@ -57,31 +58,14 @@ public static class CustomRolesHelper
             : RoleTypes.GuardianAngel;
     }
 
-    public static bool HasImpKillButton(this PlayerControl player, bool considerVanillaShift = false)
+    public static bool HasImpKillButton(this PlayerControl player)
     {
-        /*
-        if (player == null) return false;
-        var customRole = player.GetCustomRole();
-        bool ModSideHasKillButton = customRole.GetDYRole() == RoleTypes.Impostor || customRole.GetVNRole() is CustomRoles.Impostor or CustomRoles.Shapeshifter or CustomRoles.Phantom;
-
-        if (player.IsModded() || (!considerVanillaShift && !player.IsModded()))
-            return ModSideHasKillButton;
-
-        bool vanillaSideHasKillButton = EAC.OriginalRoles.TryGetValue(player.PlayerId, out var OriginalRole) ?
-                                         (OriginalRole.GetDYRole() is RoleTypes.Impostor or RoleTypes.Shapeshifter || OriginalRole.GetVNRole() is CustomRoles.Impostor or CustomRoles.Shapeshifter or CustomRoles.Phantom) : ModSideHasKillButton;
-
-        return vanillaSideHasKillButton;
-        */
-
-        // Due to the fact that change role basis is widely used in mod
-        // this function now always uses current mod role to decide kill button access?
-
         if (player == null) return false;
         if (Options.CurrentGameMode is CustomGameMode.CandR && player.Is(CustomRoles.Cop)) return true;
         var customRole = player.GetCustomRole();
         return customRole.GetDYRole() is RoleTypes.Impostor or RoleTypes.Shapeshifter || customRole.GetVNRole() is CustomRoles.Impostor or CustomRoles.Shapeshifter or CustomRoles.Phantom;
     }
-    //This is a overall check for vanilla clients to see if they are imp basis 
+    //This is a overall check for vanilla clients to see if they are Impostor basis 
     public static bool IsGhostRole(this CustomRoles role)
     {
         if (role.GetStaticRoleClass().ThisRoleType is
@@ -95,18 +79,6 @@ public static class CustomRolesHelper
 
     }
     public static bool HasGhostRole(this PlayerControl player) => player.GetCustomRole().IsGhostRole() || player.IsAnySubRole(x => x.IsGhostRole());
-
-
-    /*
-    public static bool IsExperimental(this CustomRoles role)
-    {
-        return role is
-            CustomRoles.Disperser or
-            CustomRoles.Doppelganger or
-            CustomRoles.God or
-            CustomRoles.Quizmaster;
-    }
-    */
 
     // Add-ons
     public static bool IsAdditionRole(this CustomRoles role) => role > CustomRoles.NotAssigned;
@@ -233,7 +205,7 @@ public static class CustomRolesHelper
     }
     public static bool IsTasklessCrewmate(this CustomRoles role)
     {
-        // Based on Imp but counted as crewmate
+        // Based on Impostor but counted as Crewmate
         return role.GetVNRole() is CustomRoles.Impostor && role.IsCrewmate();
     }
     public static bool IsTaskBasedCrewmate(this CustomRoles role)
@@ -349,9 +321,8 @@ public static class CustomRolesHelper
         return role.GetStaticRoleClass().ThisRoleType is Custom_RoleType.Madmate;
     }
     /// <summary>
-    /// Role Changes the Crewmates Team, Including changing to Impostor.
+    /// Role Changes the Crewmates Team, Including changing to Impostor
     /// </summary>
-
     public static bool IsConverted(this CustomRoles role) => (role is CustomRoles.Egoist && Egoist.EgoistCountAsConverted.GetBool())
         || role is
             CustomRoles.Charmed or
@@ -490,7 +461,7 @@ public static class CustomRolesHelper
         
         return player.MainRole.IsCoven();
     }
-    public static bool CheckAddonConfilct(CustomRoles role, PlayerControl pc, bool checkLimitAddons = true)
+    public static bool CheckAddonConfilct(CustomRoles role, PlayerControl pc, bool checkLimitAddons = true, bool checkSelfAddOn = true)
     {
         // Only Add-ons
         if (!role.IsAdditionRole() || pc == null) return false;
@@ -499,7 +470,7 @@ public static class CustomRolesHelper
             return false;
 
         // if player already has this Add-on
-        else if (pc.Is(role)) return false;
+        else if (checkSelfAddOn && pc.Is(role)) return false;
 
         // Checking Lovers and Romantics
         else if ((pc.Is(CustomRoles.RuthlessRomantic) || pc.Is(CustomRoles.Romantic) || pc.Is(CustomRoles.VengefulRomantic)) && role is CustomRoles.Lovers) return false;
@@ -591,7 +562,7 @@ public static class CustomRolesHelper
                     || (pc.Is(CustomRoles.God) && !God.CanGuess.GetBool()))
                     return false; //Based on guess manager
 
-                // return true only when its a guesser, NG, guesser mode on with crew can guess (if crew role) and nnk can guess (if nnk)
+                // return true only when its a Guesser, NG, Guesser Mode on with Crewmates can guess (if Crewmate role) and nnk can guess (if NNK)
                 if (pc.Is(CustomRoles.Guesser) || pc.Is(CustomRoles.NiceGuesser)) return true;
                 if (Options.GuesserMode.GetBool())
                 {
@@ -635,11 +606,11 @@ public static class CustomRolesHelper
 
             case CustomRoles.DoubleShot:
 
-                //Guesser roles when not guesser mode
+                //Guesser roles when not Guesser Mode
                 if (!Options.GuesserMode.GetBool() && !pc.Is(CustomRoles.EvilGuesser) && !pc.Is(CustomRoles.NiceGuesser) && (!pc.Is(CustomRoles.Doomsayer)) && !pc.Is(CustomRoles.Guesser))
                     return false;
 
-                //If guesser mode but doomsayer can't die anyways
+                //If Guesser Mode but Doomsayer can't die anyways
                 if (pc.Is(CustomRoles.Doomsayer) && Doomsayer.DoesNotSuicideWhenMisguessing.GetBool())
                     return false;
 
@@ -827,7 +798,6 @@ public static class CustomRolesHelper
 
             case CustomRoles.Bewilder:
                 if (pc.Is(CustomRoles.Torch)
-                    //|| pc.Is(CustomRoles.Sunglasses)
                     || pc.Is(CustomRoles.Randomizer)
                     || pc.Is(CustomRoles.Lighter)
                     || pc.Is(CustomRoles.Solsticer)
@@ -1272,27 +1242,27 @@ public static class CustomRolesHelper
         };
     public static bool IsDesyncRole(this CustomRoles role) => role.GetDYRole() != RoleTypes.GuardianAngel;
     /// <summary>
-    /// Role is Madmate Or Impostor
+    /// Role is Madmate or Impostor
     /// </summary>
     public static bool IsImpostorTeam(this CustomRoles role) => role.IsImpostor() || role == CustomRoles.Madmate;
     /// <summary>
-    /// Role Is Not Impostor nor Madmate Nor Neutral nor Coven.
+    /// Role is not Impostor nor Madmate nor Neutral nor Coven
     /// </summary>
     public static bool IsCrewmate(this CustomRoles role) => !role.IsImpostor() && !role.IsNeutral() && !role.IsMadmate() && !role.IsCoven();
     /// <summary>
-    /// Role is Rascal or Madmate and not trickster.
+    /// Role is Rascal or Madmate and not Trickster
     /// </summary>
     public static bool IsImpostorTeamV2(this CustomRoles role) => role == CustomRoles.Rascal || role == CustomRoles.Madmate || (role.IsImpostorTeamV3() && role != CustomRoles.Trickster && (!role.IsConverted() || role is CustomRoles.Madmate));
     /// <summary>
-    /// Role Is Converting or neutral.
+    /// Role is Converting or Neutral
     /// </summary>
     public static bool IsNeutralTeamV2(this CustomRoles role) => (role.IsConverted() && role != CustomRoles.Madmate || role.IsNeutral()) && role != CustomRoles.Madmate;
     /// <summary>
-    /// Role is not impostor nor rascal nor madmate nor converting nor neutral or role is trickster.
+    /// Role is not Impostor nor Rascal nor Madmate nor Converting nor Neutral or role is Trickster
     /// </summary>
     public static bool IsCrewmateTeamV2(this CustomRoles role) => !(role.IsImpostorTeamV2() || role.IsNeutralTeamV2()) || role == CustomRoles.Trickster;
     /// <summary>
-    /// Role is Enchanted Or Coven
+    /// Role is Enchanted or Coven
     /// </summary>
     public static bool IsCovenTeam(this CustomRoles role) => role.IsCoven() || role == CustomRoles.Enchanted;
     public static bool IsImpostorTeamV3(this CustomRoles role) => role.IsImpostor() || role.IsMadmate();
@@ -1427,9 +1397,7 @@ public static class CustomRolesHelper
            CustomRoles.Contaminator => CountTypes.Contaminator,
            CustomRoles.Massacre => CountTypes.Massacre,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
-
-           // CustomRoles.Phantom => CountTypes.OutOfGame,
-           //   CustomRoles.CursedSoul => CountTypes.OutOfGame, // if they count as OutOfGame, it prevents them from winning lmao
+               
        };
     public static CustomWinner GetNeutralCustomWinnerFromRole(this CustomRoles role) // only to be used for Neutrals
         => role switch

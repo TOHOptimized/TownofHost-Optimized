@@ -55,12 +55,10 @@ internal class Retributionist : RoleBase
             return true;
         return false;
     }
-    public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
+    public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
-        seen ??= seer;
-
         if (!seer.IsAlive() && seen.IsAlive())
-            return ColorString(GetRoleColor(CustomRoles.Retributionist), " " + seen.PlayerId.ToString()) + " ";
+            return CustomRoles.Retributionist.GetColoredTextByRole($" {seen.Data.PlayerId} ");
 
         return string.Empty;
     }
@@ -102,10 +100,10 @@ internal class Retributionist : RoleBase
 
         if (msg == "/ret")
         {
-            string text = GetString("PlayerIdList");
+            var text = new System.Text.StringBuilder(GetString("PlayerIdList"));
             foreach (var npc in Main.AllAlivePlayerControls)
-                text += "\n" + npc.PlayerId.ToString() + " → (" + npc.GetDisplayRoleAndSubName(npc, false) + ") " + npc.GetRealName();
-            SendMessage(text, pc.PlayerId);
+                text.Append("\n" + npc.PlayerId.ToString() + " → (" + npc.GetDisplayRoleAndSubName(npc, false) + ") " + npc.GetRealName());
+            SendMessage(text.ToString(), pc.PlayerId);
             return true;
         }
 

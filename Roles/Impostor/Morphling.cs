@@ -32,9 +32,7 @@ internal class Morphling : RoleBase
     {
         if (player == null || !player.IsAlive()) return false;
 
-        Main.CheckShapeshift.TryGetValue(player.PlayerId, out var IsShapeshift);
-
-        return IsShapeshift;
+        return Main.CheckShapeshift.GetValueOrDefault(player.PlayerId, false);
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)

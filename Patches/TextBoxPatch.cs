@@ -45,7 +45,7 @@ class TextBoxTMPSetTextPatch
             }
         }
 
-        if (!__instance.tempTxt.ToString().Equals(DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.EnterName), StringComparison.OrdinalIgnoreCase) && __instance.characterLimit > 0)
+        if (!__instance.tempTxt.ToString().Equals(FastDestroyableSingleton<TranslationController>.Instance.GetString(StringNames.EnterName), StringComparison.OrdinalIgnoreCase) && __instance.characterLimit > 0)
         {
             int length = __instance.tempTxt.Length;
             __instance.tempTxt.Length = Math.Min(__instance.tempTxt.Length, __instance.characterLimit);
@@ -79,39 +79,3 @@ class TextBoxTMPSetTextPatch
         return false;
     }
 }
-
-//Thanks https://github.com/NuclearPowered/Reactor/blob/master/Reactor/Patches/Fixes/CursorPosPatch.cs
-
-//2024.8.13 break this
-
-/// <summary>
-/// "Fixes" an issue where empty TextBoxes have wrong cursor positions.
-/// </summary>
-/*[HarmonyPatch(typeof(TextMeshProExtensions), nameof(TextMeshProExtensions.CursorPos), typeof(TextMeshPro))]
-[HarmonyPatch(typeof(TextMeshProExtensions), nameof(TextMeshProExtensions.CursorPos), typeof(TextMeshPro), typeof(int))]
-internal static class CursorPosPatch
-{
-    public static bool Prefix(TextMeshPro self, ref Vector2 __result)
-    {
-        if (self.textInfo == null || self.textInfo.lineCount == 0 || self.textInfo.lineInfo[0].characterCount <= 0)
-        {
-            __result = self.GetTextInfo(" ").lineInfo.First().lineExtents.max;
-            return false;
-        }
-
-        return true;
-    }
-} */
-
-
-
-/* Originally by KARPED1EM. Reference: https://github.com/KARPED1EM/TownOfNext/blob/TONX/TONX/Patches/TextBoxPatch.cs */
-/*[HarmonyPatch(typeof(TextBoxTMP))]
-public class TextBoxPatch
-{
-    [HarmonyPatch(nameof(TextBoxTMP.SetText)), HarmonyPrefix]
-    public static void ModifyCharacterLimit(TextBoxTMP __instance)
-    {
-        __instance.characterLimit = 1200;
-    }
-}*/

@@ -1,11 +1,8 @@
-﻿using AmongUs.GameOptions;
-using MS.Internal.Xml.XPath;
-using TOHE.Roles.Crewmate;
 using TOHE.Roles.Double;
-using UnityEngine;
 using static TOHE.Options;
 
 namespace TOHE.Roles.Neutral;
+
 internal class Slayer : RoleBase
 {
     //===========================SETUP================================\\

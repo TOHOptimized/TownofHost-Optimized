@@ -464,7 +464,6 @@ public static class ToggleOptionPatch
         if (ModGameOptionsMenu.OptionList.TryGetValue(__instance, out var index))
         {
             var item = OptionItem.AllOptions[index];
-            //Logger.Info($"{item.Name}, {index}", "ToggleOption.Initialize.TryGetValue");
             __instance.TitleText.text = item.GetName();
             __instance.CheckMark.enabled = item.GetBool();
             return false;
@@ -477,7 +476,6 @@ public static class ToggleOptionPatch
         if (ModGameOptionsMenu.OptionList.TryGetValue(__instance, out var index))
         {
             var item = OptionItem.AllOptions[index];
-            //Logger.Info($"{item.Name}, {index}", "ToggleOption.UpdateValue.TryGetValue");
             item.SetValue(__instance.GetBool() ? 1 : 0);
             NotificationPopperPatch.AddSettingsChangeMessage(index, item, false);
             return false;
@@ -583,7 +581,7 @@ public static class NumberOptionPatch
     [HarmonyPatch(nameof(NumberOption.Increase)), HarmonyPrefix]
     public static bool IncreasePrefix(NumberOption __instance)
     {
-        // This is for mod options. Vanilla options's button should be disabled at this moment
+        // This is for Mod options. Vanilla options's button should be disabled at this moment
         if (__instance.Value >= __instance.ValidRange.max)
         {
             __instance.Value = __instance.ValidRange.min;
@@ -608,7 +606,7 @@ public static class NumberOptionPatch
     [HarmonyPatch(nameof(NumberOption.Decrease)), HarmonyPrefix]
     public static bool DecreasePrefix(NumberOption __instance)
     {
-        // This is for mod options. Vanilla options's button should be disabled at this moment
+        // This is for Mod options. Vanilla options's button should be disabled at this moment
         if (__instance.Value <= __instance.ValidRange.min)
         {
             __instance.Value = __instance.ValidRange.max;
@@ -642,10 +640,9 @@ public static class StringOptionPatch
             var item = OptionItem.AllOptions[index];
             var name = item.GetName();
             var name1 = name;
-            var language = DestroyableSingleton<TranslationController>.Instance.currentLanguage.languageID;
-            //Logger.Info($" Language: {language}", "StringOption.Initialize");
+            var language = FastDestroyableSingleton<TranslationController>.Instance.currentLanguage.languageID;
 
-            if (EnumHelper.GetAllValues<CustomRoles>().Find(x => GetString($"{x}") == name1.RemoveHtmlTags(), out var role))
+            if (EnumHelper.GetAllValues<CustomRoles>().Find(x => GetString(x.ToString()) == name1.RemoveHtmlTags(), out var role))
             {
                 name = $"<size=3.5>{name}</size>";
                 __instance.TitleText.fontWeight = FontWeight.Black;
@@ -685,7 +682,7 @@ public static class StringOptionPatch
             {
                 var item = OptionItem.AllOptions[index];
                 var name = item.GetName();
-                if (Enum.GetValues<CustomRoles>().Find(x => GetString($"{x}") == name.RemoveHtmlTags(), out var role))
+                if (Enum.GetValues<CustomRoles>().Find(x => GetString(x.ToString()) == name.RemoveHtmlTags(), out var role))
                 {
                     var roleName = role.IsVanilla() ? role + "TOHO" : role.ToString();
                     var str = GetString($"{roleName}InfoLong");

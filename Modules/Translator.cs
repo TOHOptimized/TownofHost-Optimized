@@ -13,6 +13,7 @@ public static class Translator
     public static Dictionary<string, Dictionary<int, string>> translateMaps;
     public const string LANGUAGE_FOLDER_NAME = Main.LANGUAGE_FOLDER_NAME;
     private static readonly Dictionary<SupportedLangs, Dictionary<CustomRoles, string>> ActualRoleNames = [];
+    public static readonly Dictionary<CustomRoles, HashSet<string>> CrossLangRoleNames = [];
     public static void Init()
     {
         Logger.Info("Loading language files...", "Translator");
@@ -23,11 +24,10 @@ public static class Translator
     {
         try
         {
-            // Get the directory containing the JSON files (e.g., TOHE.Resources.Lang)
-            string jsonDirectory = "TOHE.Resources.Lang";
             // Get the assembly containing the resources
-            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            string[] jsonFileNames = GetJsonFileNames(assembly, jsonDirectory);
+            var assembly = Assembly.GetExecutingAssembly();
+            // Get the directory containing the JSON files (e.g., TOHE.Resources.Lang)
+            string[] jsonFileNames = GetJsonFileNames(assembly, "TOHE.Resources.Lang");
 
             translateMaps = [];
 
@@ -75,30 +75,36 @@ public static class Translator
         {
             Logger.Error($"Error: {ex}", "Translator");
         }
-        //カスタム翻訳ファイルの読み込み
         if (!Directory.Exists(LANGUAGE_FOLDER_NAME)) Directory.CreateDirectory(LANGUAGE_FOLDER_NAME);
 
-        // 翻訳テンプレートの作成
         CreateTemplateFile();
+
+        //Load vanilla role names into CrossLangRoleNames
+        BuildInitialCrossLangRoleNames();
+        
         foreach (var lang in EnumHelper.GetAllValues<SupportedLangs>())
         {
             if (File.Exists(@$"./{LANGUAGE_FOLDER_NAME}/{lang}.dat"))
             {
+                Logger.Info($"Loading custom translation file from: {lang}.dat", "Translator");
                 if (!ActualRoleNames.ContainsKey(lang))
                     ActualRoleNames.Add(lang, []);
                 foreach (var role in CustomRolesHelper.AllRoles)
                 {
                     if (ActualRoleNames[lang].ContainsKey(role))
-                        ActualRoleNames[lang][role] = GetString($"{role}", lang);
+                        ActualRoleNames[lang][role] = GetString(role.ToString(), lang);
                     else
                     {
-                        ActualRoleNames[lang].Add(role, GetString($"{role}", lang));
+                        ActualRoleNames[lang].Add(role, GetString(role.ToString(), lang));
                     }
                 }
                 UpdateCustomTranslation($"{lang}.dat"/*, lang*/);
                 LoadCustomTranslation($"{lang}.dat", lang);
             }
         }
+
+        // Load all custom translation role names into CrossLangRoleNames
+        AttachCustomCrossLangRoleNames();
     }
     static void MergeJsonIntoTranslationMap(Dictionary<string, Dictionary<int, string>> translationMaps, int languageId, Dictionary<string, string> jsonDictionary)
     {
@@ -127,49 +133,6 @@ public static class Translator
         return resourceNames.Where(resourceName => resourceName.StartsWith(directoryName) && resourceName.EndsWith(".json")).ToArray();
     }
 
-    //public static void LoadLangs()
-    //{
-    //    var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-    //    var stream = assembly.GetManifestResourceStream("TOHE.Resources.String.csv");
-    //    translateMaps = new Dictionary<string, Dictionary<int, string>>();
-
-    //    var options = new CsvOptions()
-    //    {
-    //        HeaderMode = HeaderMode.HeaderPresent,
-    //        AllowNewLineInEnclosedFieldValues = false,
-    //    };
-    //    foreach (var line in CsvReader.ReadFromStream(stream, options))
-    //    {
-    //        if (line.Values[0][0] == '#') continue;
-    //        try
-    //        {
-    //            Dictionary<int, string> dic = new();
-    //            for (int i = 1; i < line.ColumnCount; i++)
-    //            {
-    //                int id = int.Parse(line.Headers[i]);
-    //                dic[id] = line.Values[i].Replace("\\n", "\n").Replace("\\r", "\r");
-    //            }
-    //            if (!translateMaps.TryAdd(line.Values[0], dic))
-    //                Logger.Warn($"待翻译的 CSV 文件中存在重复项：第{line.Index}行 => \"{line.Values[0]}\"", "Translator");
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Logger.Warn($"翻译文件错误：第{line.Index}行 => \"{line.Values[0]}\"", "Translator");
-    //            Logger.Warn(ex.ToString(), "Translator");
-    //        }
-    //    }
-
-    //    // カスタム翻訳ファイルの読み込み
-    //    if (!Directory.Exists(LANGUAGE_FOLDER_NAME)) Directory.CreateDirectory(LANGUAGE_FOLDER_NAME);
-
-    //    // 翻訳テンプレートの作成
-    //    CreateTemplateFile();
-    //    foreach (var lang in Enum.GetValues(typeof(SupportedLangs)))
-    //    {
-    //        if (File.Exists(@$"./{LANGUAGE_FOLDER_NAME}/{lang}.dat"))
-    //            LoadCustomTranslation($"{lang}.dat", (SupportedLangs)lang);
-    //    }
-    //}
     public static void GetActualRoleName(this CustomRoles role, out string RealName)
     {
         var currentlang = TranslationController.Instance.currentLanguage.languageID;
@@ -179,15 +142,21 @@ public static class Translator
                 RealName = RoleString;
             else
             {
-                RealName = GetString($"{role}");
+                RealName = GetString(role.ToString());
                 Logger.Info($"Error while obtaining Rolename for LANG: {currentlang}/{role}", "Translator.GetActualRoleName");
             }
             return;
         }
         else
         {
-            RealName = GetString($"{role}");
+            RealName = GetString(role.ToString());
         }
+    }
+    public static string GetActualRoleName(this CustomRoles role)
+    {
+        return ActualRoleNames.TryGetValue(TranslationController.Instance.currentLanguage.languageID, out var RoleList) && RoleList.TryGetValue(role, out var RoleString)
+            ? RoleString
+            : GetString($"{role}");
     }
     public static string GetString(string s, Dictionary<string, string> replacementDic = null, bool console = false, bool showInvalid = true, bool vanilla = false)
     {
@@ -399,9 +368,53 @@ public static class Translator
         var lang = TranslationController.Instance.currentLanguage.languageID;
         foreach (var title in translateMaps)
         {
-            if (!title.Value.TryGetValue((int)lang, out var text)) text = "";
+            var text = title.Value.GetValueOrDefault((int)lang, string.Empty);
             sb.Append($"{title.Key}:{text.Replace("\n", "\\n").Replace("\r", "\\r")}\n");
         }
         File.WriteAllText(@$"./{LANGUAGE_FOLDER_NAME}/export_{lang}.dat", sb.ToString());
+    }
+    
+    private static void BuildInitialCrossLangRoleNames()
+    {
+        // Runs before Load Custom Translations to get all vanilla texts
+        foreach (var role in CustomRolesHelper.AllRoles)
+        {
+            if (!CrossLangRoleNames.ContainsKey(role))
+            {
+                CrossLangRoleNames.Add(role, []);
+            }
+            else
+            {
+                continue;
+            }
+
+            foreach (var lang in EnumHelper.GetAllValues<SupportedLangs>())
+            {
+                var name = GetString($"{role}", lang).ToLower().Trim().Replace(" ", string.Empty);
+                if (!CrossLangRoleNames[role].Contains(name))
+                {
+                    CrossLangRoleNames[role].Add(name);
+                }
+            }
+        }
+    }
+
+    private static void AttachCustomCrossLangRoleNames()
+    {
+        // Add custom role names to the cross-lang role names
+        // Sort and Remove Invaild
+        foreach (var item in CrossLangRoleNames)
+        {
+            foreach (var lang in EnumHelper.GetAllValues<SupportedLangs>())
+            {
+                var name = GetString($"{item}", lang).ToLower().Trim().Replace(" ", string.Empty);
+                if (!CrossLangRoleNames[item.Key].Contains(name))
+                {
+                    CrossLangRoleNames[item.Key].Add(name);
+                }
+            }
+
+            item.Value.Where(x => x.Contains("<INVALID:".ToLower())).ToList().ForEach(x => item.Value.Remove(x));
+        }
     }
 }
