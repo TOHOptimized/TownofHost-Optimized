@@ -30,7 +30,7 @@ class CoShowIntroPatch
 
             StartGameHostPatch.RpcSetDisconnected(disconnected: false);
 
-            DestroyableSingleton<HudManager>.Instance.SetHudActive(true);
+            FastDestroyableSingleton<HudManager>.Instance.SetHudActive(true);
 
             foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
             {
@@ -549,7 +549,7 @@ class BeginCrewmatePatch
                     case CustomRoles.Workaholic:
                     case CustomRoles.Snitch:
                     case CustomRoles.TaskManager:
-                        PlayerControl.LocalPlayer.Data.Role.IntroSound = DestroyableSingleton<HudManager>.Instance.TaskCompleteSound;
+                        PlayerControl.LocalPlayer.Data.Role.IntroSound = FastDestroyableSingleton<HudManager>.Instance.TaskCompleteSound;
                         break;
 
                     case CustomRoles.Opportunist:
@@ -566,7 +566,7 @@ class BeginCrewmatePatch
                     case CustomRoles.Dictator:
                     case CustomRoles.Mayor:
                     case CustomRoles.Swapper:
-                        PlayerControl.LocalPlayer.Data.Role.IntroSound = DestroyableSingleton<HudManager>.Instance.Chat.warningSound;
+                        PlayerControl.LocalPlayer.Data.Role.IntroSound = FastDestroyableSingleton<HudManager>.Instance.Chat.warningSound;
                         break;
                         
                     case CustomRoles.Saboteur:
@@ -578,13 +578,13 @@ class BeginCrewmatePatch
 
                     case CustomRoles.Pixie:
                     case CustomRoles.Seeker:
-                        PlayerControl.LocalPlayer.Data.Role.IntroSound = DestroyableSingleton<HnSImpostorScreamSfx>.Instance.HnSOtherImpostorTransformSfx;
+                        PlayerControl.LocalPlayer.Data.Role.IntroSound = FastDestroyableSingleton<HnSImpostorScreamSfx>.Instance.HnSOtherImpostorTransformSfx;
                         break;
 
                     case CustomRoles.Sheriff:
                     case CustomRoles.ChiefOfPolice:
                     case CustomRoles.Deputy:
-                        PlayerControl.LocalPlayer.Data.Role.IntroSound = DestroyableSingleton<HnSImpostorScreamSfx>.Instance.HnSOtherYeehawSfx;
+                        PlayerControl.LocalPlayer.Data.Role.IntroSound = FastDestroyableSingleton<HnSImpostorScreamSfx>.Instance.HnSOtherYeehawSfx;
                         break;
 
                     case CustomRoles.GM:
@@ -592,7 +592,7 @@ class BeginCrewmatePatch
                         __instance.TeamTitle.color = Utils.GetRoleColor(role);
                         __instance.BackgroundBar.material.color = Utils.GetRoleColor(role);
                         __instance.ImpostorText.gameObject.SetActive(true);
-                        PlayerControl.LocalPlayer.Data.Role.IntroSound = DestroyableSingleton<HudManager>.Instance.TaskCompleteSound;
+                        PlayerControl.LocalPlayer.Data.Role.IntroSound = FastDestroyableSingleton<HudManager>.Instance.TaskCompleteSound;
                         __instance.ImpostorText.text = GetString("SubText.GM");
                         break;
 
@@ -895,7 +895,7 @@ class IntroCutsceneDestroyPatch
                             var newOutfit = PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default];
                             PlayerControl.LocalPlayer.RawSetOutfit(newOutfit, PlayerOutfitType.Shapeshifted);
                             PlayerControl.LocalPlayer.shapeshiftTargetPlayerId = PlayerControl.LocalPlayer.PlayerId;
-                            DestroyableSingleton<HudManager>.Instance.AbilityButton.OverrideText(DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.ShapeshiftAbilityUndo));
+                            FastDestroyableSingleton<HudManager>.Instance.AbilityButton.OverrideText(FastDestroyableSingleton<TranslationController>.Instance.GetString(StringNames.ShapeshiftAbilityUndo));
                         }
 
                         Main.CheckShapeshift[x] = false;
