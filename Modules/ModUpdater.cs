@@ -16,11 +16,8 @@ namespace TOHE;
 [HarmonyPatch]
 public class ModUpdater
 {
-    //private static readonly string URL_2018k = "http://api.tohre.dev";
     private static readonly string URL_Github = "https://api.github.com/repos/0xDrMoe/TownofHost-Enhanced";
-    //public static readonly string downloadTest = "https://github.com/Pietrodjaowjao/TOHEN-Contributions/releases/download/v123123123/TOHE.dll";
     public static bool hasUpdate = false;
-    //public static bool isNewer = false;
     public static bool forceUpdate = false;
     public static bool isBroken = false;
     public static bool isChecked = false;
@@ -70,7 +67,7 @@ public class ModUpdater
     const string MiniRegionInstallResource = "TOHE.Resources.Mini.RegionInstall.dll";
     private static void CheckCustomRegions()
     {
-        var regions = ServerManager.Instance.AvailableRegions;
+        var regions = FastDestroyableSingleton<ServerManager>.Instance.AvailableRegions;
         var hasCustomRegions = false;
         var forceUpdate = false;
 
