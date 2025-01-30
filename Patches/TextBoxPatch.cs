@@ -79,5 +79,3 @@ class TextBoxTMPSetTextPatch
         return false;
     }
 }
-
-//Thanks https://github.com/NuclearPowered/Reactor/blob/master/Reactor/Patches/Fixes/CursorPosPatch.cs
