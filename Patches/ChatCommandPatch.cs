@@ -110,7 +110,7 @@ internal class ChatCommands
                     if (version_text.Length > 0)
                     {
                         player.SetName(title);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text.ToString(), false);
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text.ToString(), false);
                         player.SetName(name);
                     }
                 }
@@ -121,7 +121,7 @@ internal class ChatCommands
                     if (version_text.Length > 0)
                     {
                         player.SetName(title);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text.ToString(), false);
+                        FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, version_text.ToString(), false);
                         player.SetName(name);
                     }
                 }
@@ -340,7 +340,7 @@ internal class ChatCommands
 
                         default:
                             __instance.AddChat(PlayerControl.LocalPlayer, "crew | imp");
-                            if (TranslationController.Instance.currentLanguage.languageID == SupportedLangs.Brazilian)
+                            if (FastDestroyableSingleton<TranslationController>.Instance.currentLanguage.languageID == SupportedLangs.Brazilian)
                             {
                                 __instance.AddChat(PlayerControl.LocalPlayer, "tripulante | impostor");
                             }
@@ -637,7 +637,7 @@ internal class ChatCommands
 
                     if (string.IsNullOrEmpty(subArgs))
                     {
-                       HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser(), Devbox, UpBox, ColorBox)}");                   
+                       FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser().GetUserType(), Devbox, UpBox, ColorBox)}");
                     }
                     else
                     {
@@ -648,21 +648,21 @@ internal class ChatCommands
                                 var targetplayer = Utils.GetPlayerById(meid);
                                 if (targetplayer != null && targetplayer.GetClient() != null)
                                 {
-                                    HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandTargetInfo"), targetplayer.PlayerId, targetplayer.GetRealName(clientData: true), targetplayer.GetClient().FriendCode, targetplayer.GetClient().GetHashedPuid(), targetplayer.FriendCode.GetDevUser())}");                              
+                                    FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandTargetInfo"), targetplayer.PlayerId, targetplayer.GetRealName(clientData: true), targetplayer.GetClient().FriendCode, targetplayer.GetClient().GetHashedPuid(), targetplayer.FriendCode.GetDevUser().GetUserType())}");
                                 }
                                 else
                                 {
-                                    HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{(GetString("Message.MeCommandInvalidID"))}");
+                                    FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{(GetString("Message.MeCommandInvalidID"))}");
                                 }
                             }
                             else
                             {
-                                HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser(), Devbox, UpBox, ColorBox)}");
+                                FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{string.Format(GetString("Message.MeCommandInfo"), PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.GetRealName(clientData: true), PlayerControl.LocalPlayer.GetClient().FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid(), PlayerControl.LocalPlayer.FriendCode.GetDevUser(), Devbox, UpBox, ColorBox)}");
                             }
                         }
                         else
                         {
-                            HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{(GetString("Message.MeCommandInvalidID"))}");
+                            FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, (PlayerControl.LocalPlayer.FriendCode.GetDevUser().HasTag() ? "\n" : string.Empty) + $"{(GetString("Message.MeCommandInvalidID"))}");
                         }
                     }
                     break;
@@ -1984,7 +1984,7 @@ internal class ChatCommands
 
         if (name == "" || name == string.Empty) return false;
 
-        if ((TranslationController.InstanceExists ? TranslationController.Instance.currentLanguage.languageID : SupportedLangs.SChinese) == SupportedLangs.SChinese)
+        if ((FastDestroyableSingleton<TranslationController>.Instance ? FastDestroyableSingleton<TranslationController>.Instance.currentLanguage.languageID : SupportedLangs.SChinese) == SupportedLangs.SChinese)
         {
             Regex r = new("[\u4e00-\u9fa5]+$");
             MatchCollection mc = r.Matches(name);
@@ -1992,7 +1992,7 @@ internal class ChatCommands
             for (int i = 0; i < mc.Count; i++)
             {
                 if (mc[i].ToString() == "是") continue;
-                result += mc[i]; //匹配结果是完整的数字，此处可以不做拼接的
+                result += mc[i];
             }
             name = FixRoleNameInput(result.Replace("是", string.Empty).Trim());
         }
@@ -2175,15 +2175,15 @@ internal class ChatCommands
         }            
 
         var Des = result.GetInfoLong();
-        var title = "▲" + $"<color=#ffffff>" + result.GetRoleTitle() + "</color>\n";
+        var title = $"▲<color=#ffffff>{result.GetRoleTitle()}</color>\n";
         var Conf = new StringBuilder();
         string rlHex = Utils.GetRoleColorCode(result);
-        if (Options.CustomRoleSpawnChances.ContainsKey(result))
+        if (Options.CustomRoleSpawnChances.TryGetValue(result, out var spawnChances))
         {
-            Utils.ShowChildrenSettings(Options.CustomRoleSpawnChances[result], ref Conf);
+            Utils.ShowChildrenSettings(spawnChances, ref Conf);
             var cleared = Conf.ToString();
             var Setting = $"<color={rlHex}>{GetString(result.ToString())} {GetString("Settings:")}</color>\n";
-            Conf.Clear().Append($"<color=#ffffff>" + $"<size={Csize}>" + Setting + cleared + "</size>" + "</color>");
+            Conf.Clear().Append($"<color=#ffffff><size={Csize}>{Setting}{cleared}</size></color>");
             
         }
         // Show role info
@@ -3637,14 +3637,14 @@ class ChatUpdatePatch
         if (clientId == -1)
         {
             player.SetName(title);
-            DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg, false);
+            FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg, false);
             player.SetName(name);
         }
 
         if (clientId == AmongUsClient.Instance.ClientId || sendTo == PlayerControl.LocalPlayer.PlayerId)
         {
             player.SetName(title);
-            DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg, false);
+            FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg, false);
             player.SetName(name);
             return;
         }
@@ -3702,10 +3702,10 @@ class RpcSendChatPatch
         }
         int return_count = PlayerControl.LocalPlayer.name.Count(x => x == '\n');
         chatText = new StringBuilder(chatText).Insert(0, "\n", return_count).ToString();
-        if (AmongUsClient.Instance.AmClient && DestroyableSingleton<HudManager>.Instance)
-            DestroyableSingleton<HudManager>.Instance.Chat.AddChat(__instance, chatText);
+        if (AmongUsClient.Instance.AmClient && FastDestroyableSingleton<HudManager>.Instance)
+            FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(__instance, chatText);
         if (chatText.Contains("who", StringComparison.OrdinalIgnoreCase))
-            DestroyableSingleton<UnityTelemetry>.Instance.SendWho();
+            FastDestroyableSingleton<UnityTelemetry>.Instance.SendWho();
         MessageWriter messageWriter = AmongUsClient.Instance.StartRpc(__instance.NetId, (byte)RpcCalls.SendChat, SendOption.None);
         messageWriter.Write(chatText);
         messageWriter.EndMessage();
