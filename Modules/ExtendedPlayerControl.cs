@@ -1280,7 +1280,7 @@ static class ExtendedPlayerControl
         SetUpRoleTextPatch.IsInIntro = false;
         ReportDeadBodyPatch.AfterReportTasks(reporter, target, true);
         MeetingRoomManager.Instance.AssignSelf(reporter, target);
-        DestroyableSingleton<HudManager>.Instance.OpenMeetingRoom(reporter);
+        FastDestroyableSingleton<HudManager>.Instance.OpenMeetingRoom(reporter);
         
         _ = new LateTask(() =>
         {
