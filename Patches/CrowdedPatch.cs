@@ -147,9 +147,8 @@ internal static class Crowded
             IGameOptions targetOptions = __instance.GetTargetOptions();
             __instance.UpdateImpostorsButtons(targetOptions.NumImpostors);
             __instance.UpdateMaxPlayersButtons(targetOptions);
-            __instance.UpdateLanguageButton((uint)targetOptions.Keywords);
-            __instance.MapMenu.UpdateMapButtons((int)targetOptions.MapId);
-            __instance.GameModeText.text = DestroyableSingleton<TranslationController>.Instance.GetString(GameModesHelpers.ModeToName[GameOptionsManager.Instance.CurrentGameOptions.GameMode]);
+            __instance.MapMenu.UpdateMapButtons(targetOptions.MapId);
+            __instance.GameModeText.text = FastDestroyableSingleton<TranslationController>.Instance.GetString(GameModesHelpers.ModeToName[GameOptionsManager.Instance.CurrentGameOptions.GameMode]);
             return false;
 
             // Skip maxplayers => max impostors array check here
@@ -454,7 +453,7 @@ public class ShapeShifterPagingBehaviour(IntPtr ptr) : AbstractPagingBehaviour(p
 
     public override void Start()
     {
-        PageText = Instantiate(HudManager.Instance.KillButton.cooldownTimerText, shapeshifterMinigame.transform);
+        PageText = Instantiate(FastDestroyableSingleton<HudManager>.Instance.KillButton.cooldownTimerText, shapeshifterMinigame.transform);
         PageText.name = PAGE_INDEX_GAME_OBJECT_NAME;
         PageText.enableWordWrapping = false;
         PageText.gameObject.SetActive(true);
@@ -507,7 +506,7 @@ public class VitalsPagingBehaviour(IntPtr ptr) : AbstractPagingBehaviour(ptr)
 
     public override void Start()
     {
-        PageText = Instantiate(HudManager.Instance.KillButton.cooldownTimerText, vitalsMinigame.transform);
+        PageText = Instantiate(FastDestroyableSingleton<HudManager>.Instance.KillButton.cooldownTimerText, vitalsMinigame.transform);
         PageText.name = PAGE_INDEX_GAME_OBJECT_NAME;
         PageText.enableWordWrapping = false;
         PageText.gameObject.SetActive(true);
