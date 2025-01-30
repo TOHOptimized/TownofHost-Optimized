@@ -625,8 +625,6 @@ public static class Utils
         }
 
         if (States.Disconnected) return false;
-        //if (playerData.Role.IsImpostor)
-        //    hasTasks = false; //Tasks are determined based on CustomRole
 
         if (Options.CurrentGameMode == CustomGameMode.FFA) return false;
         if (playerData.IsDead && Options.GhostIgnoreTasks.GetBool()) hasTasks = false;
