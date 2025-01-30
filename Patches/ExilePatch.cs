@@ -186,7 +186,7 @@ class ExileControllerWrapUpPatch
         }
 
         //This should happen shortly after the Exile Controller wrap up finished for clients
-        //For Certain Laggy clients 0.8f delay is still not enough. The finish time can differ.
+        //For Certain Laggy clients 0.8f delay is still not enough. The finish time can differ
         //If the delay is too long, it will influence other normal players' view
 
         GameStates.AlreadyDied |= !Utils.IsAllAlive;
@@ -196,7 +196,7 @@ class ExileControllerWrapUpPatch
         _ = new LateTask(() =>
         {
             if (!AmongUsClient.Instance.IsGameOver)
-                DestroyableSingleton<HudManager>.Instance.SetHudActive(true);
+                FastDestroyableSingleton<HudManager>.Instance.SetHudActive(true);
         }, 0.8f, "Set Hud Active");
 
         Logger.Info("Start of Task Phase", "Phase");
