@@ -4458,7 +4458,7 @@
   "WinnerRoleText.Slayer": "Slayer Wins!",
 
   "FragileHunter": "Fragile Hunter",
-  "FragileHunterInfo": "Kill the <color=#d3d3Dd3>Fragile</color>!",
+  "FragileHunterInfo": "Kill the Fragile!",
   "FragileHunterInfoLong": "(Add-ons):\nAs the Fragile Hunter, if you kill the Fragile, you automatically win the game.",
   "WinnerRoleText.FragileHunter": "The Fragile was hunted!",
 
@@ -4475,5 +4475,6 @@
   "MassacreInfo": "Kill your targets",
   "MassacreInfoLong": "The transformed version of Contaminator.",
   "MassacreSwitch": "You will become a Contaminator next round",
-  "WinnerRoleText.Massacre": "Massacre Wins!"
+  "WinnerRoleText.Massacre": "Massacre Wins!",
+  "MassacreKillCooldown": "Massacre kill cooldown"
 }
