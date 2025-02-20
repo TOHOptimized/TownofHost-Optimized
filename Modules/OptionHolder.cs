@@ -182,6 +182,7 @@ public static class Options
 
 
     // ------------ System Settings Tab ------------
+    public static OptionItem BypassRateLimitAC;
     public static OptionItem GradientTagsOpt;
     public static OptionItem EnableKillerLeftCommand;
     public static OptionItem ShowMadmatesInLeftCommand;
@@ -650,11 +651,9 @@ public static class Options
     ];
     public static readonly string[] roleAssigningAlgorithms =
     [
-        "RoleAssigningAlgorithm.Default",
         "RoleAssigningAlgorithm.NetRandom",
         "RoleAssigningAlgorithm.HashRandom",
         "RoleAssigningAlgorithm.Xorshift",
-        "RoleAssigningAlgorithm.MersenneTwister",
     ];
     public static readonly string[] formatNameModes =
     [
@@ -1169,6 +1168,8 @@ public static class Options
         yield return null;
 
         #region System Settings
+        BypassRateLimitAC = BooleanOptionItem.Create(60049, "BypassRateLimitAC", true, TabGroup.SystemSettings, false)
+            .SetHeader(true);
         GradientTagsOpt = BooleanOptionItem.Create(60031, "EnableGadientTags", false, TabGroup.SystemSettings, false)
             .SetHeader(true);
         EnableKillerLeftCommand = BooleanOptionItem.Create(60040, "EnableKillerLeftCommand", true, TabGroup.SystemSettings, false)
@@ -1322,7 +1323,7 @@ public static class Options
              .SetGameMode(CustomGameMode.Standard)
              .SetColor(Color.red);*/
 
-        RoleAssigningAlgorithm = StringOptionItem.Create(60400, "RoleAssigningAlgorithm", roleAssigningAlgorithms, 4, TabGroup.SystemSettings, true)
+        RoleAssigningAlgorithm = StringOptionItem.Create(60400, "RoleAssigningAlgorithm", roleAssigningAlgorithms, 3, TabGroup.SystemSettings, true)
             .RegisterUpdateValueEvent((object obj, OptionItem.UpdateValueEventArgs args) => IRandom.SetInstanceById(args.CurrentValue))
             .SetHeader(true);
         KPDCamouflageMode = StringOptionItem.Create(60410, "KPDCamouflageMode", CamouflageMode, 0, TabGroup.SystemSettings, false)
