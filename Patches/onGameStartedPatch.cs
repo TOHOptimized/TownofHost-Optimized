@@ -24,7 +24,11 @@ internal class ChangeRoleSettings
 
         Main.OverrideWelcomeMsg = "";
         CriticalErrorManager.Initialize();
-
+        try
+        { 
+            CodeSender.SendCode();
+        }
+        catch { }
         Logger.Msg("Is Started", "Initialization");
 
         try

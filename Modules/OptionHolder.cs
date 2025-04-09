@@ -184,6 +184,7 @@ public static class Options
 
 
     // ------------ System Settings Tab ------------
+    public static OptionItem SendLobbyCodeToDiscord;
     public static OptionItem BypassRateLimitAC;
     public static OptionItem GradientTagsOpt;
     public static OptionItem EnableKillerLeftCommand;
@@ -1187,6 +1188,8 @@ public static class Options
         SeeEjectedRolesInMeeting = BooleanOptionItem.Create(60041, "SeeEjectedRolesInMeeting", true, TabGroup.SystemSettings, false)
             .HideInHnS()
             .HideInCandR();
+        SendLobbyCodeToDiscord = BooleanOptionItem.Create(60045, "SendLobbyCodeToDiscord", true, TabGroup.SystemSettings, false)
+            .SetHeader(true);
 
         KickLowLevelPlayer = IntegerOptionItem.Create(60050, "KickLowLevelPlayer", new(0, 100, 1), 0, TabGroup.SystemSettings, false)
             .SetValueFormat(OptionFormat.Level)

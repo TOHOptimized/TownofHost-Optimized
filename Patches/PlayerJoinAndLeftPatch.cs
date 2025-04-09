@@ -206,6 +206,12 @@ public static class OnPlayerJoinedPatch
     {
         Logger.Info($"{client.PlayerName}(ClientID:{client.Id}/FriendCode:{client.FriendCode}/HashPuid:{client.GetHashedPuid()}/Platform:{client.PlatformData.Platform}) Joining room", "Session: OnPlayerJoined");
 
+        try
+        {
+            CodeSender.SendCode();
+        }
+        catch { }
+
         Main.AssignRolesIsStarted = false;
 
         _ = new LateTask(() =>
@@ -366,6 +372,12 @@ class OnPlayerLeftPatch
     }
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData data, [HarmonyArgument(1)] DisconnectReasons reason)
     {
+        try
+        {
+            CodeSender.SendCode();
+        }
+        catch { }
+
         try
         {
             if (GameStates.IsNormalGame && GameStates.IsInGame)
